@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil Docente - Registro Rapido | EduAtitude</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Cabecalho Global -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/index.html" class="brand-title">
+        EduAtitude
+        <span class="brand-badge">Docente</span>
+      </a>
+      <nav class="nav-menu" aria-label="Navegacao Principal">
+        <a href="/index.html" class="nav-link">Inicio</a>
+        <a href="/professor.html" class="nav-link active">Visao Professor</a>
+        <a href="/coordenacao.html" class="nav-link">Visao Coordenacao</a>
+        <a href="/estudante.html" class="nav-link">Visao Estudante</a>
+        <a href="/documentacao/index.html" class="nav-link doc-link">Documentacao</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+
+    <!-- Introducao e Seletor de Turma -->
+    <section class="page-intro">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1 class="page-title">Diario de Observacao Atitudinal (Mobile-First)</h1>
+          <p class="page-subtitle">Registro continuo em sala de aula em ate 3 toques por estudante. Sem burocracia excessiva.</p>
+        </div>
+        <div style="min-width: 240px;">
+          <label for="select-turma" class="form-label">Selecionar Turma Ativa:</label>
+          <select id="select-turma" class="form-select">
+            <option value="">Carregando turmas...</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notificacao de Toast -->
+    <div id="toast-box" class="toast-notice" role="alert"></div>
+
+    <!-- Alerta de Dialogos Pedagogicos Pendentes -->
+    <section id="dialogos-alerta-box" class="card" style="display:none; border-left:4px solid var(--color-accent); background-color:#f0f9ff;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+          <strong style="color:var(--color-primary); font-size:0.95rem;">Solicitacoes de Dialogo Pedagogico Abertas</strong>
+          <p id="dialogos-alerta-texto" style="font-size:0.85rem; color:var(--text-muted); margin-top:0.2rem;">
+            Existem estudantes ou responsaveis desta turma aguardando devolutiva ou esclarecimento etico.
+          </p>
+        </div>
+        <a href="#secao-dialogos" class="btn btn-secondary btn-sm">Ver Solicitacoes</a>
+      </div>
+    </section>
+
+    <!-- Area de Registro Rapido em 3 Cliques -->
+    <section class="card" aria-labelledby="registro-rapido-title">
+      <div class="card-header">
+        <h2 id="registro-rapido-title" class="card-title">Registro Rapido em 3 Passos</h2>
+        <span class="card-badge" style="background:#e0f2fe; color:#0369a1;">Ergonomia: Lei de Fitts</span>
+      </div>
+
+      <form id="form-registro-rapido" onsubmit="event.preventDefault();">
+        
+        <!-- Passo 1: Selecionar o Aluno -->
+        <div class="step-container">
+          <div class="step-header">
+            <span class="step-number">1</span>
+            <span>Clique 1: Selecione o Estudante</span>
+            <span id="estudante-selecionado-label" style="font-size:0.8rem; font-weight:normal; color:var(--text-light); margin-left:auto;">Nenhum estudante selecionado</span>
+          </div>
+          <div id="grade-estudantes" class="selection-grid">
+            <div style="grid-column: 1 / -1; padding: 1rem; color: var(--text-light); font-size: 0.85rem;">Carregando estudantes da turma...</div>
+          </div>
+        </div>
+
+        <!-- Passo 2: Selecionar a Dimensao Socioemocional -->
+        <div class="step-container">
+          <div class="step-header">
+            <span class="step-number">2</span>
+            <span>Clique 2: Selecione a Dimensao Atitudinal</span>
+            <span id="dimensao-selecionada-label" style="font-size:0.8rem; font-weight:normal; color:var(--text-light); margin-left:auto;">Nenhuma dimensao selecionada</span>
+          </div>
+          <div class="selection-grid">
+            <button type="button" class="select-card dim-btn" data-dim="responsabilidade">
+              <strong>Responsabilidade</strong>
+              <span style="font-size:0.7rem; color:var(--text-light); margin-top:0.2rem;">Prazos e Cuidados</span>
+            </button>
+            <button type="button" class="select-card dim-btn" data-dim="colaboracao">
+              <strong>Colaboracao</strong>
+              <span style="font-size:0.7rem; color:var(--text-light); margin-top:0.2rem;">Trabalho em Equipe</span>
+            </button>
+            <button type="button" class="select-card dim-btn" data-dim="autonomia">
+              <strong>Autonomia</strong>
+              <span style="font-size:0.7rem; color:var(--text-light); margin-top:0.2rem;">Iniciativa Propria</span>
+            </button>
+            <button type="button" class="select-card dim-btn" data-dim="participacao">
+              <strong>Participacao</strong>
+              <span style="font-size:0.7rem; color:var(--text-light); margin-top:0.2rem;">Debates e Curiosidade</span>
+            </button>
+            <button type="button" class="select-card dim-btn" data-dim="respeito">
+              <strong>Respeito</strong>
+              <span style="font-size:0.7rem; color:var(--text-light); margin-top:0.2rem;">Convivencia e Acordos</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Passo 3: Selecionar a Polaridade Formativa -->
+        <div class="step-container">
+          <div class="step-header">
+            <span class="step-number">3</span>
+            <span>Clique 3: Selecione a Polaridade da Observacao</span>
+          </div>
+          <div class="polarity-options">
+            <button type="button" class="polarity-btn pos pol-btn" data-pol="positiva">
+              [Positiva] Evidencia de Forca
+            </button>
+            <button type="button" class="polarity-btn opt pol-btn" data-pol="oportunidade">
+              [Oportunidade] Ponto de Crescimento
+            </button>
+            <button type="button" class="polarity-btn neu pol-btn" data-pol="neutra">
+              [Neutra] Factual / Observacional
+            </button>
+          </div>
+        </div>
+
+        <!-- Opcional Sanfonado: Detalhamento Descritivo -->
+        <details style="margin-bottom: 1.25rem; border: 1px dashed var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem; background: #fafafa;">
+          <summary style="font-size: 0.85rem; font-weight: 600; cursor: pointer; color: var(--color-primary);">
+            Adicionar anotacao qualitativa descritiva (Opcional - Expandir)
+          </summary>
+          <div style="margin-top: 0.75rem;">
+            <label for="nota-observacao" class="form-label" style="font-size: 0.8rem;">Contexto da evidencia pedagógica observada:</label>
+            <textarea id="nota-observacao" class="form-textarea" placeholder="Exemplo: Auxiliou colega com dificuldade na leitura do mapa durante a atividade em duplas..."></textarea>
+          </div>
+        </details>
+
+        <!-- Botao de Envio Principal -->
+        <div style="display:flex; gap:0.75rem; align-items:center;">
+          <button type="button" id="btn-confirmar-registro" class="btn btn-primary" style="flex:1;">
+            Confirmar Registro de Evidencia
+          </button>
+          <button type="button" id="btn-limpar-selecao" class="btn btn-secondary">
+            Limpar
+          </button>
+        </div>
+
+      </form>
+    </section>
+
+    <!-- Linha do Tempo de Evidencias da Turma -->
+    <section class="card" aria-labelledby="historico-title">
+      <div class="card-header">
+        <h2 id="historico-title" class="card-title">Linha do Tempo de Evidencias da Turma</h2>
+        <div style="display:flex; gap:0.5rem; align-items:center;">
+          <label for="filtro-dimensao" style="font-size:0.8rem; font-weight:600;">Filtrar:</label>
+          <select id="filtro-dimensao" class="form-select" style="min-height:34px; padding:0.2rem 0.5rem; font-size:0.8rem; width:auto;">
+            <option value="">Todas as Dimensoes</option>
+            <option value="responsabilidade">Responsabilidade</option>
+            <option value="colaboracao">Colaboracao</option>
+            <option value="autonomia">Autonomia</option>
+            <option value="participacao">Participacao</option>
+            <option value="respeito">Respeito e Convivencia</option>
+          </select>
+        </div>
+      </div>
+
+      <div id="timeline-container" class="timeline">
+        <p style="font-size: 0.85rem; color: var(--text-light);">Carregando historico de evidencias...</p>
+      </div>
+    </section>
+
+    <!-- Secao de Solicitacoes de Dialogo da Turma -->
+    <section id="secao-dialogos" class="card" aria-labelledby="dialogos-title">
+      <div class="card-header">
+        <h2 id="dialogos-title" class="card-title">Canal de Dialogo e Contestacao Pedagogica</h2>
+        <span class="card-badge" style="background:#f1f5f9; color:var(--text-main);">Garantia de Contraditorio (LGPD)</span>
+      </div>
+
+      <div id="dialogos-lista" style="display:flex; flex-direction:column; gap:0.75rem;">
+        <p style="font-size: 0.85rem; color: var(--text-light);">Carregando dialogos pedagogicos...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div><strong>EduAtitude</strong> - Modulo Docente</div>
+      <div class="footer-links">
+        <a href="/documentacao/mapa-navegacao.html">Mapa de Navegacao</a>
+        <a href="/documentacao/wireframes.html">Wireframe Docente</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      EduApp.initProfessorPage();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Perfil Estudante e Responsaveis - Radar e Dialogo | EduAtitude</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- Cabecalho Global -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/index.html" class="brand-title">
+        EduAtitude
+        <span class="brand-badge">Estudante & Familia</span>
+      </a>
+      <nav class="nav-menu" aria-label="Navegacao Principal">
+        <a href="/index.html" class="nav-link">Inicio</a>
+        <a href="/professor.html" class="nav-link">Visao Professor</a>
+        <a href="/coordenacao.html" class="nav-link">Visao Coordenacao</a>
+        <a href="/estudante.html" class="nav-link active">Visao Estudante</a>
+        <a href="/documentacao/index.html" class="nav-link doc-link">Documentacao</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+
+    <!-- Introducao e Seletor do Estudante Ativo -->
+    <section class="page-intro">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <h1 class="page-title">Espaco Formativo do Estudante e Familiares</h1>
+          <p class="page-subtitle">Acompanhamento transparente, radar formativo Kindbegrip e canal de dialogo etico sem ranqueamento.</p>
+        </div>
+        <div style="min-width: 240px;">
+          <label for="select-estudante-view" class="form-label">Visualizar como Estudante:</label>
+          <select id="select-estudante-view" class="form-select">
+            <option value="">Carregando estudantes...</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Notificacao de Toast -->
+    <div id="toast-box-estudante" class="toast-notice" role="alert"></div>
+
+    <!-- 1. Radar Formativo Socioemocional (Kindbegrip) -->
+    <div class="grid-2">
+      
+      <!-- Grafico Radar Sobreposto: Visao Escolar vs Autoavaliacao -->
+      <section class="card" aria-labelledby="radar-individual-title">
+        <div class="card-header">
+          <h2 id="radar-individual-title" class="card-title">Meu Radar Socioemocional (Kindbegrip)</h2>
+          <span class="card-badge" style="background:#fef3c7; color:#92400e;">Devolutiva Visual</span>
+        </div>
+        
+        <div class="radar-box">
+          <svg id="svg-radar-estudante" class="radar-svg" viewBox="0 0 400 400" aria-label="Grafico de radar comparativo entre escola e autoavaliacao"></svg>
+          <div class="radar-legend">
+            <div class="legend-item">
+              <span class="legend-color" style="background:#2563eb;"></span>
+              <span>Observacao da Escola</span>
+            </div>
+            <div class="legend-item">
+              <span class="legend-color" style="background:#16a34a;"></span>
+              <span>Minha Autoavaliacao</span>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:0.75rem; padding:0.75rem; background:#f8fafc; border-radius:var(--radius-sm); font-size:0.8rem; color:var(--text-muted); text-align:center;">
+          <strong>Garantia Etica:</strong> Este radar tem finalidade exclusivamente formativa e orientadora. O sistema nao produz notas classificatorias nem compara estudantes entre si.
+        </div>
+      </section>
+
+      <!-- Painel de Forcas e Oportunidades de Desenvolvimento -->
+      <section class="card" aria-labelledby="forcas-title">
+        <div class="card-header">
+          <h2 id="forcas-title" class="card-title">Sintese de Potenciais e Metas</h2>
+          <span class="card-badge" style="background:#f0fdf4; color:#166534;">Metodologia Ativa</span>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:1.25rem;">
+          
+          <div style="border-left:4px solid var(--color-success); padding:0.75rem 1rem; background:var(--color-success-bg); border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+            <strong style="color:var(--color-success); font-size:0.95rem;">Suas Principais Forcas Identificadas</strong>
+            <p id="texto-forcas" style="font-size:0.85rem; color:var(--text-main); margin-top:0.25rem;">
+              Carregando dimensoes de destaque...
+            </p>
+          </div>
+
+          <div style="border-left:4px solid var(--color-warning); padding:0.75rem 1rem; background:var(--color-warning-bg); border-radius:0 var(--radius-sm) var(--radius-sm) 0;">
+            <strong style="color:var(--color-warning); font-size:0.95rem;">Oportunidades de Crescimento Pessoal</strong>
+            <p id="texto-crescimento" style="font-size:0.85rem; color:var(--text-main); margin-top:0.25rem;">
+              Carregando areas de desenvolvimento...
+            </p>
+          </div>
+
+          <div style="padding:0.75rem 1rem; background:#f1f5f9; border-radius:var(--radius-sm); font-size:0.85rem; color:var(--text-muted);">
+            <strong>Frequencia e Compromisso:</strong>
+            <div id="dados-frequencia-estudante" style="margin-top:0.25rem;">
+              Assiduidade: --% | Tarefas em dia.
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+
+    <!-- 2. Modulo de Autoavaliacao Reflexiva -->
+    <section class="card" aria-labelledby="autoavaliacao-title">
+      <div class="card-header">
+        <h2 id="autoavaliacao-title" class="card-title">Minha Autoavaliacao Reflexiva (Mensal)</h2>
+        <span class="card-badge" style="background:#e0f2fe; color:#0369a1;">Participacao Discente</span>
+      </div>
+
+      <form id="form-autoavaliacao" onsubmit="event.preventDefault();">
+        <p style="font-size:0.9rem; color:var(--text-muted); margin-bottom:1rem;">
+          Reflita sobre suas atitudes e atribua notas de 1 a 5 para cada dimensao neste bimestre:
+        </p>
+
+        <div class="grid-3" style="margin-bottom:1rem;">
+          <div class="form-group">
+            <label for="auto-resp" class="form-label">Responsabilidade (1 a 5):</label>
+            <input type="number" id="auto-resp" class="form-input" min="1" max="5" value="4" required>
+            <span style="font-size:0.75rem; color:var(--text-light);">Cuidado com materiais e prazos</span>
+          </div>
+          <div class="form-group">
+            <label for="auto-colab" class="form-label">Colaboracao (1 a 5):</label>
+            <input type="number" id="auto-colab" class="form-input" min="1" max="5" value="4" required>
+            <span style="font-size:0.75rem; color:var(--text-light);">Trabalho em grupo e respeito</span>
+          </div>
+          <div class="form-group">
+            <label for="auto-auto" class="form-label">Autonomia (1 a 5):</label>
+            <input type="number" id="auto-auto" class="form-input" min="1" max="5" value="4" required>
+            <span style="font-size:0.75rem; color:var(--text-light);">Iniciativa e gestao do tempo</span>
+          </div>
+          <div class="form-group">
+            <label for="auto-part" class="form-label">Participacao (1 a 5):</label>
+            <input type="number" id="auto-part" class="form-input" min="1" max="5" value="4" required>
+            <span style="font-size:0.75rem; color:var(--text-light);">Interesse e perguntas em sala</span>
+          </div>
+          <div class="form-group">
+            <label for="auto-resp-conv" class="form-label">Respeito e Convivencia (1 a 5):</label>
+            <input type="number" id="auto-resp-conv" class="form-input" min="1" max="5" value="5" required>
+            <span style="font-size:0.75rem; color:var(--text-light);">Acordos e empatia com pares</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="auto-reflexao" class="form-label">Reflexao Qualitativa Pessoal:</label>
+          <textarea id="auto-reflexao" class="form-textarea" placeholder="O que funcionou bem neste periodo? O que voce pretende aprimorar no proximo mes?"></textarea>
+        </div>
+
+        <button type="button" id="btn-enviar-autoavaliacao" class="btn btn-primary">
+          Enviar Minha Autoavaliacao
+        </button>
+      </form>
+    </section>
+
+    <!-- 3. Linha do Tempo e Canal de Dialogo/Contestacao Etica -->
+    <section class="card" aria-labelledby="dialogo-title">
+      <div class="card-header">
+        <div>
+          <h2 id="dialogo-title" class="card-title">Evidencias Registradas e Canal de Dialogo</h2>
+          <p style="font-size:0.85rem; color:var(--text-light); margin-top:0.25rem;">
+            Consulte as observacoes pedagogicas e solicite esclarecimento ou dialógo respeitoso caso sinta necessidade.
+          </p>
+        </div>
+      </div>
+
+      <!-- Formulario Retratil de Abertura de Dialogo -->
+      <div id="box-novo-dialogo" style="display:none; border:1px solid var(--border-color); background:#f8fafc; border-radius:var(--radius-sm); padding:1rem; margin-bottom:1.25rem;">
+        <h3 style="font-size:1rem; margin-bottom:0.75rem; color:var(--color-primary);">Solicitar Dialogo Pedagogico</h3>
+        <form id="form-dialogo" onsubmit="event.preventDefault();">
+          <input type="hidden" id="dialogo-obs-id">
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="dialogo-autor-tipo" class="form-label">Quem esta solicitando o dialogo?</label>
+              <select id="dialogo-autor-tipo" class="form-select">
+                <option value="Estudante">O proprio Estudante</option>
+                <option value="Responsavel">Pai, Mae ou Responsavel Legal</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="dialogo-autor-nome" class="form-label">Seu Nome Completo:</label>
+              <input type="text" id="dialogo-autor-nome" class="form-input" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="dialogo-mensagem" class="form-label">Mensagem / Esclarecimento Construtivo:</label>
+            <textarea id="dialogo-mensagem" class="form-textarea" placeholder="Explique seu ponto de vista ou relate ocorridos que auxiliem a equipe escolar a compreender o contexto..." required></textarea>
+          </div>
+          <div style="display:flex; gap:0.5rem; justify-content:flex-end;">
+            <button type="button" id="btn-cancelar-dialogo" class="btn btn-secondary">Cancelar</button>
+            <button type="button" id="btn-enviar-dialogo" class="btn btn-primary">Enviar Solicitacao de Dialogo</button>
+          </div>
+        </form>
+      </div>
+
+      <div id="estudante-timeline" class="timeline">
+        <p style="font-size:0.85rem; color:var(--text-light);">Carregando historico de observacoes do estudante...</p>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div><strong>EduAtitude</strong> - Modulo do Estudante e Familiares</div>
+      <div class="footer-links">
+        <a href="/documentacao/mapa-navegacao.html">Mapa de Navegacao</a>
+        <a href="/documentacao/wireframes.html">Wireframe Estudante</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      EduApp.initEstudantePage();
+    });
+  </script>
+</body>
+</html>

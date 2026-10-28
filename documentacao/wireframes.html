@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Galeria de Wireframes e Ergonomia Cognitiva | EduAtitude</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .wireframe-container {
+      background: #f1f5f9;
+      border: 2px dashed #94a3b8;
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .wireframe-phone {
+      max-width: 380px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 3px solid #334155;
+      border-radius: 24px;
+      padding: 1.25rem 1rem;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    }
+    .wireframe-desktop-screen {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #ffffff;
+      border: 3px solid #334155;
+      border-radius: 8px;
+      padding: 1.25rem;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+    }
+    .wf-block {
+      background: #f8fafc;
+      border: 1px dashed #64748b;
+      padding: 0.5rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.75rem;
+      color: #334155;
+    }
+    .wf-header-bar {
+      height: 36px;
+      background: #e2e8f0;
+      border-bottom: 1px solid #94a3b8;
+      display: flex;
+      align-items: center;
+      padding: 0 0.5rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+    }
+    .callout-box {
+      background: #ffffff;
+      border-left: 4px solid var(--color-primary);
+      padding: 1rem;
+      border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+      margin-top: 1rem;
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabecalho -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/index.html" class="brand-title">
+        EduAtitude
+        <span class="brand-badge">Documentacao de Entrega</span>
+      </a>
+      <nav class="nav-menu" aria-label="Navegacao">
+        <a href="/index.html" class="nav-link">Voltar ao Sistema</a>
+        <a href="/documentacao/index.html" class="nav-link">Indice</a>
+        <a href="/documentacao/mapa-navegacao.html" class="nav-link">Mapa de Navegacao</a>
+        <a href="/documentacao/wireframes.html" class="nav-link active">Galeria de Wireframes</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+
+    <section class="page-intro">
+      <h1 class="page-title">Galeria de Wireframes e Fundamentacao Ergonomica</h1>
+      <p class="page-subtitle">
+        Projetos conceituais de baixa e media fidelidade para dispositivos moveis e desktop. Analise baseada na Lei de Fitts e nas Heuristicas de Nielsen.
+      </p>
+    </section>
+
+    <!-- 1. Wireframe Mobile: Perfil Professor -->
+    <section class="card" aria-labelledby="wf-prof-title">
+      <div class="card-header">
+        <div>
+          <h2 id="wf-prof-title" class="card-title">1. Wireframe Mobile: Perfil Professor (Registro em 3 Toques)</h2>
+          <span style="font-size:0.8rem; color:var(--text-light);">Foco: Agilidade em sala de aula e minimizacao da sobrecarga cognitiva</span>
+        </div>
+        <span class="card-badge" style="background:#dbeafe; color:#1e40af;">Dispositivo Movel</span>
+      </div>
+
+      <div class="wireframe-container">
+        <div class="wireframe-phone">
+          <div class="wf-header-bar">
+            <span>[EduAtitude Docente] Turma: [5o Ano A]</span>
+          </div>
+
+          <div class="wf-block" style="background:#e0f2fe; font-weight:600;">
+            [Passo 1] Selecionar Aluno (Grid de Toque Rapido)
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
+              <div style="background:#fff; border:1px solid #0284c7; padding:4px; text-align:center;">[x] Lucas Lima</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center;">Beatriz Costa</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center;">Gabriel Rocha</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center;">Thiago Duarte</div>
+            </div>
+          </div>
+
+          <div class="wf-block" style="background:#e0f2fe; font-weight:600;">
+            [Passo 2] Dimensao Socioemocional
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:4px; margin-top:4px;">
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center;">Responsabilidade</div>
+              <div style="background:#fff; border:1px solid #0284c7; padding:4px; text-align:center;">[x] Colaboracao</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center;">Autonomia</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:4px; text-align:center;">Participacao</div>
+            </div>
+          </div>
+
+          <div class="wf-block" style="background:#e0f2fe; font-weight:600;">
+            [Passo 3] Polaridade Formativa
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:4px; margin-top:4px;">
+              <div style="background:#dcfce7; border:1px solid #16a34a; padding:6px; text-align:center; font-weight:700;">[x] + Positiva</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:6px; text-align:center;">~ Oportunidade</div>
+              <div style="background:#fff; border:1px solid #cbd5e1; padding:6px; text-align:center;">= Neutra</div>
+            </div>
+          </div>
+
+          <div class="wf-block" style="border:1px dashed #94a3b8;">
+            [+] Anotacao Qualitativa Complementar (Gaveta Sanfonada Opcional)
+          </div>
+
+          <div style="background:#1e3a8a; color:#fff; text-align:center; padding:10px; font-weight:700; border-radius:4px; margin-top:8px;">
+            [ Botao Salvar Registro - Altura 48px ]
+          </div>
+        </div>
+
+        <div class="callout-box">
+          <strong>Fundamentacao Ergonomica (Lei de Fitts e Nielsen):</strong>
+          <ul style="margin-left:1.25rem; margin-top:0.35rem;">
+            <li><strong>Lei de Fitts:</strong> Todos os botoes de acao possuem dimensao minima de 44x48 pixels, situados na "Thumb Zone" (zona natural de alcance do polegar) para permitir operacao com uma unica mao.</li>
+            <li><strong>Heuristica de Nielsen 6 (Reconhecimento vs Memorizacao):</strong> O docente visualiza simultaneamente o aluno selecionado, a dimensao e a polaridade sem depender de menus ocultos.</li>
+            <li><strong>Heuristica de Nielsen 5 (Prevencao de Erros):</strong> O botao de envio final apenas efetua o registro apos a selecao dos tres elementos estruturantes.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. Wireframe Desktop: Perfil Coordenacao -->
+    <section class="card" aria-labelledby="wf-coord-title">
+      <div class="card-header">
+        <div>
+          <h2 id="wf-coord-title" class="card-title">2. Wireframe Desktop: Painel Coordenacao e MTSS</h2>
+          <span style="font-size:0.8rem; color:var(--text-light);">Foco: Triagem visual tempestiva, radar Kindbegrip agregado e intervencoes</span>
+        </div>
+        <span class="card-badge" style="background:#e0e7ff; color:#3730a3;">Desktop Analitico</span>
+      </div>
+
+      <div class="wireframe-container">
+        <div class="wireframe-desktop-screen">
+          <div class="wf-header-bar" style="justify-content:space-between;">
+            <span>[EduAtitude Gestao] Painel Coordenacao MTSS</span>
+            <span>Filtro Turma: [Todas as Turmas] | Periodo: [1o Bimestre]</span>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 2fr 1fr; gap:12px; margin-bottom:12px;">
+            <div class="wf-block" style="background:#fff;">
+              <strong>Matriz de Alerta Precoce (EdInsights / MTSS)</strong>
+              <div style="font-size:0.75rem; color:#64748b; margin:4px 0;">Cruzamento: Frequencia (&lt;75%), Tarefas Pendentes, Queda Atitudinal</div>
+              <div style="border:1px solid #cbd5e1; padding:4px; margin-top:4px;">
+                [Tier 3 - Vermelho] Thiago Duarte (Frequencia: 72% | 5 Tarefas Pendentes) -> [Botao Intervir]<br>
+                [Tier 2 - Amarelo] Gabriel Rocha (Frequencia: 81% | 3 Tarefas Pendentes) -> [Botao Intervir]<br>
+                [Tier 1 - Verde] Lucas Lima (Frequencia: 98% | 0 Tarefas Pendentes) -> [Acompanhar]
+              </div>
+            </div>
+
+            <div class="wf-block" style="background:#fff; text-align:center;">
+              <strong>Clima Coletivo (Radar Kindbegrip)</strong>
+              <div style="height:90px; border:1px dashed #94a3b8; display:flex; align-items:center; justify-content:center; margin-top:6px;">
+                [ Poligono Pentagonal das 5 Dimensoes ]
+              </div>
+              <div style="font-size:0.7rem; color:#64748b; margin-top:4px;">Indice Clima Positivo: 85%</div>
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+            <div class="wf-block" style="background:#fff;">
+              <strong>Planos de Apoio Pedagogico (MTSS Tiers 2 e 3)</strong>
+              <div style="border:1px solid #cbd5e1; padding:4px; margin-top:4px;">
+                - Thiago Duarte: Tutoria de organizacao e agenda adaptada [Em Andamento]<br>
+                - Gabriel Rocha: Checklist formativo na carteira [Em Planejamento]
+              </div>
+            </div>
+
+            <div class="wf-block" style="background:#fff;">
+              <strong>Trilha de Auditoria e Conformidade LGPD</strong>
+              <div style="border:1px solid #cbd5e1; padding:4px; margin-top:4px; font-family:monospace; font-size:0.65rem;">
+                2026-03-10: Prof. Carlos registrou observacao alu-001 [Art. 7, V]<br>
+                2026-03-13: Familia abriu dialogo pedagogico alu-003 [Art. 14, §1o]
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-box">
+          <strong>Fundamentacao Ergonomica (Nielsen e Visualizacao de Dados):</strong>
+          <ul style="margin-left:1.25rem; margin-top:0.35rem;">
+            <li><strong>Heuristica de Nielsen 1 (Visibilidade do Estado do Sistema):</strong> Codificacao semantica por cores de alerta (Verde para Universal, Amarelo para Suporte Focado e Vermelho para Suporte Intensivo) viabiliza triagem visual em segundos, sem necessidade de leitura exaustiva de relatorios extensos.</li>
+            <li><strong>Abordagem Holandesa e Finlandesa:</strong> O radar agregado afasta o foco punitivo individual, transformando a observacao em insumo para gestao do clima coletivo da escola.</li>
+            <li><strong>Conformidade LGPD:</strong> A trilha de auditoria e visivel para os gestores, garantindo a rastreabilidade e a legitimidade institucional dos registros.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Wireframe Mobile: Perfil Estudante e Responsaveis -->
+    <section class="card" aria-labelledby="wf-est-title">
+      <div class="card-header">
+        <div>
+          <h2 id="wf-est-title" class="card-title">3. Wireframe Mobile: Estudante e Familiares (Radar e Dialogo)</h2>
+          <span style="font-size:0.8rem; color:var(--text-light);">Foco: Visao formativa, protagonismo discente e garantia de contraditorio</span>
+        </div>
+        <span class="card-badge" style="background:#fef3c7; color:#92400e;">Dispositivo Movel</span>
+      </div>
+
+      <div class="wireframe-container">
+        <div class="wireframe-phone">
+          <div class="wf-header-bar">
+            <span>[EduAtitude Aluno] Lucas Ferreira Lima</span>
+          </div>
+
+          <div class="wf-block" style="text-align:center; background:#fff;">
+            <strong>Meu Radar Socioemocional (Kindbegrip)</strong>
+            <div style="height:100px; border:1px dashed #94a3b8; display:flex; align-items:center; justify-content:center; margin-top:6px;">
+              [ Sobreposicao: Linha Azul (Escola) vs Linha Verde (Autoavaliacao) ]
+            </div>
+            <div style="font-size:0.7rem; color:#166534; margin-top:4px;">Forcas: Responsabilidade e Colaboracao</div>
+          </div>
+
+          <div class="wf-block" style="background:#f0fdf4; border-left:3px solid #16a34a;">
+            <strong>Minha Autoavaliacao Reflexiva</strong>
+            <div style="font-size:0.75rem; margin-top:4px;">
+              [ Slider 1 a 5 nas 5 Dimensoes ]<br>
+              [ Campo de Reflexao Qualitativa Pessoal ]<br>
+              <div style="background:#16a34a; color:#fff; text-align:center; padding:4px; border-radius:2px; margin-top:4px;">[ Salvar Autoavaliacao ]</div>
+            </div>
+          </div>
+
+          <div class="wf-block" style="background:#fff;">
+            <strong>Historico e Canal de Dialogo Etico</strong>
+            <div style="border:1px solid #cbd5e1; padding:4px; margin-top:4px; font-size:0.7rem;">
+              - Observacao de Colaboracao em 10/03<br>
+              <div style="border:1px solid #0284c7; background:#eff6ff; padding:3px; margin-top:2px;">
+                [ Botao: Solicitar Dialogo Pedagogico ]
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="callout-box">
+          <strong>Fundamentacao Etica e Pedagogica:</strong>
+          <ul style="margin-left:1.25rem; margin-top:0.35rem;">
+            <li><strong>Ausencia de Ranqueamento:</strong> O estudante nunca visualiza comparacoes, escores punitivos ou listas com notas de seus colegas, salvaguardando a autoestima e a intimidade.</li>
+            <li><strong>Contraditorio Pedagogico:</strong> O botao de abertura de dialogo materializa o direito a explicabilidade e a escuta ativa preconizados na Proposta Pedagogica das melhores redes publicas e privadas.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>EduAtitude - Galeria de Wireframes e Analise Ergonomica</div>
+      <div class="footer-links">
+        <a href="/documentacao/index.html">Indice da Documentacao</a>
+        <a href="/documentacao/mapa-navegacao.html">Mapa de Navegacao</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

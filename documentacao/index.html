@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Documentacao do Projeto - EduAtitude</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <style>
+    .doc-nav-card {
+      border: 1px solid var(--border-light);
+      background: #ffffff;
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cabecalho -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="/index.html" class="brand-title">
+        EduAtitude
+        <span class="brand-badge">Documentacao de Entrega</span>
+      </a>
+      <nav class="nav-menu" aria-label="Navegacao">
+        <a href="/index.html" class="nav-link">Voltar ao Sistema</a>
+        <a href="/documentacao/index.html" class="nav-link active">Indice da Documentacao</a>
+        <a href="/documentacao/mapa-navegacao.html" class="nav-link">Mapa de Navegacao</a>
+        <a href="/documentacao/wireframes.html" class="nav-link">Galeria de Wireframes</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-container">
+
+    <section class="page-intro">
+      <h1 class="page-title">Documentacao de Engenharia e UX do Projeto</h1>
+      <p class="page-subtitle">
+        Artefatos formais requeridos para entrega acadêmica: Arquitetura de Informacao, Matriz RBAC de Permissoes, Wireframes e Analise Ergonomica.
+      </p>
+    </section>
+
+    <!-- Cards de Acesso aos Artefatos -->
+    <div class="grid-2">
+      
+      <article class="doc-nav-card">
+        <h2 style="font-size: 1.25rem; color: var(--color-primary); margin-bottom: 0.5rem;">
+          1. Mapa de Navegacao e Arquitetura de Informacao
+        </h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Diagrama estrutural do fluxo de telas, fluxogramas de jornada por perfil de usuario e Matriz RBAC de controle de acesso em conformidade com a LGPD.
+        </p>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1.25rem; margin-bottom: 1.25rem;">
+          <li>Hierarquia e arvore de paginas do sistema</li>
+          <li>Fluxo continuo de 3 cliques do Docente</li>
+          <li>Fluxo de triagem e intervencao MTSS da Coordenacao</li>
+          <li>Fluxo reflexivo e canal de contestacao do Estudante</li>
+          <li>Matriz de Permissoes RBAC (Docente, Coordenacao, Estudante, Familia, Admin)</li>
+        </ul>
+        <a href="/documentacao/mapa-navegacao.html" class="btn btn-primary">Abrir Mapa de Navegacao</a>
+      </article>
+
+      <article class="doc-nav-card">
+        <h2 style="font-size: 1.25rem; color: var(--color-primary); margin-bottom: 0.5rem;">
+          2. Wireframes de Baixa e Media Fidelidade
+        </h2>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+          Projetos de interface diagramados para Desktop e Mobile com fundamentacao teorica em Ergonomia Cognitiva, Heuristicas de Nielsen e Lei de Fitts.
+        </p>
+        <ul style="font-size: 0.85rem; color: var(--text-muted); margin-left: 1.25rem; margin-bottom: 1.25rem;">
+          <li>Wireframe Mobile Docente (registro agil sem sobrecarga)</li>
+          <li>Wireframe Desktop Coordenacao (painel de alertas e radar)</li>
+          <li>Wireframe Mobile Estudante (radar Kindbegrip e canal de dialogo)</li>
+          <li>Justificativas ergonomicas de Fitts (alvos &gt;= 44px na zona do polegar)</li>
+          <li>Aplicacao das Heuristicas de Usabilidade de Nielsen</li>
+        </ul>
+        <a href="/documentacao/wireframes.html" class="btn btn-primary">Abrir Galeria de Wireframes</a>
+      </article>
+
+    </div>
+
+    <!-- Fundamentacao Normativa e Legislativa -->
+    <section class="card" style="margin-top: 1rem;">
+      <h3 style="font-size: 1.15rem; color: var(--color-primary); margin-bottom: 0.75rem;">
+        Conformidade com Referenciais Pedagogicos e LGPD
+      </h3>
+      <div class="grid-3" style="font-size: 0.85rem; color: var(--text-muted);">
+        <div>
+          <strong style="color: var(--text-main);">Base Nacional Comum Curricular (BNCC):</strong>
+          <p style="margin-top: 0.25rem;">
+            As 5 dimensoes atitudinais mapeiam diretamente as Competencias Gerais 7, 8, 9 e 10 (empatia, cooperacao, autonomia, responsabilidade e cidadania).
+          </p>
+        </div>
+        <div>
+          <strong style="color: var(--text-main);">Modelo Kindbegrip e MTSS:</strong>
+          <p style="margin-top: 0.25rem;">
+            Apresentacao visual em radar de 5 eixos para dialogo construtivo, eliminando ranqueamentos publicos e orientando o apoio nos Tiers 1, 2 e 3.
+          </p>
+        </div>
+        <div>
+          <strong style="color: var(--text-main);">Lei Geral de Protecao de Dados (LGPD):</strong>
+          <p style="margin-top: 0.25rem;">
+            Em atendimento aos artigos 7 e 14 da Lei 13.709/2018, dados comportamentais de criancas e adolescentes exigem finalidade pedagogica explicita, trilha de auditoria e direito de revisao/dialogo.
+          </p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="site-footer">
+    <div class="footer-content">
+      <div>EduAtitude - Documentacao do Projeto de Desenvolvimento Web</div>
+      <div class="footer-links">
+        <a href="/index.html">Voltar ao Sistema Operacional</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

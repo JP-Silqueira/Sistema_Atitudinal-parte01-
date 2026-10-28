@@ -1,0 +1,38 @@
+Saudações, PessoALL!
+
+Encaminho o documento de referência "Sistema Web para Avaliação Atitudinal: Desafios, Possibilidades e Referências Internacionais". Recomendo fortemente uma leitura atenta, pois ele fundamenta o domínio do problema que iremos resolver.
+
+Objetivo do Trabalho
+
+Projetar a experiência de usuário (UX) e a arquitetura de informação de um Sistema Web de Avaliação Atitudinal voltado para o Ensino Básico (Fundamental I e II e Ensino Médio). O sistema deve transformar a observação comportamental e socioemocional em um ativo pedagógico estruturado, rápido e não punitivo.
+
+Perfis de Usuário e Escopo Mínimo de Funcionalidades
+
+Para elaborar os artefatos, considerem o fluxo e as necessidades de cada perfil:
+
+Professor (Mobile-First / Registro Rápido):
+Registro de observações contínuas em poucos cliques por aluno.
+Consulta ao histórico de evidências.
+Devolutiva individual e aplicação de autoavaliação.
+Coordenador de Curso & Núcleo Pedagógico (Desktop / Dashboards Analíticos):
+Sistema de Alerta Precoce (cruzamento de queda atitudinal com faltas/desempenho).
+Painel de Gestão de Clima Escolar e histórico de intervenções pedagógicas.
+Dashboard agregador por turma, aluno e dimensão atitudinal (pesquisar dimensões).
+Estudante e Responsáveis Escolares (Mobile-First / Visão Formativa e Transparente):
+Dashboard individual formativo (ex.: gráficos de evolução, sem rankings punitivos).
+Espaço para autoavaliação (estudante) e consulta ao histórico/devolutivas (responsáveis).
+Mecanismo de contestação/diálogo transparente sobre registros.
+Artefatos Requeridos para Entrega
+Mapa de Navegação (Arquitetura de Informação): Diagrama mostrando o fluxo de telas e permissões por perfil.
+Wireframes de Baixa/Média Fidelidade: Diagramação do layout de cada tela (desktop e mobile).
+Protótipo Interativo navegável (páginas HTML/CSS sem back-end): Telas prontas e clicáveis simulando a jornada de uso (utilizando Figma, Penpot, MarvelApp ou similar).
+Critérios de Qualidade
+
+Dentre outros, observe as seguintes recomendações para manter a qualidade do protótipo:
+Usabilidade Docente: O formulário de registro do professor exige no máximo 3 toques/cliques?
+Visualização de Dados: A coordenação/núcleo pedagógico consegue identificar alertas visuais sem ter que ler longos textos?
+Salvaguardas Éticas e LGPD: O sistema evita classificações punitivas ou exposição indevida entre alunos?
+Consistência Visual e Responsividade: O protótipo demonstra telas adaptadas para mobile (professor/aluno) e desktop (gestão)?
+Bons estudos e mãos à obra!
+
+---
