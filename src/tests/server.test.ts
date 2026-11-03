@@ -153,17 +153,17 @@ describe('Servidor HTTP Nativo e Endpoints REST (Sem Framework)', () => {
     assert.ok(data.error.includes('JSON invalido'));
   });
 
-  test('Servico estatico: /documentacao sem barra final responde status 200', async () => {
-    const res = await fetch(`${baseUrl}/documentacao`);
-    assert.strictEqual(res.status, 200);
-    const text = await res.text();
-    assert.ok(text.includes('Documentacao de Engenharia e UX'));
-  });
-
-  test('Servico estatico: /public/index.html responde status 200', async () => {
-    const res = await fetch(`${baseUrl}/public/index.html`);
+  test('Servico estatico: /index.html responde status 200', async () => {
+    const res = await fetch(`${baseUrl}/index.html`);
     assert.strictEqual(res.status, 200);
     const text = await res.text();
     assert.ok(text.includes('EduAtitude'));
+  });
+
+  test('Servico estatico: /css/style.css responde status 200', async () => {
+    const res = await fetch(`${baseUrl}/css/style.css`);
+    assert.strictEqual(res.status, 200);
+    const text = await res.text();
+    assert.ok(text.includes('--color-primary'));
   });
 });

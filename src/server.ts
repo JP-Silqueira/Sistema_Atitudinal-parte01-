@@ -65,8 +65,6 @@ function sendError(res: ServerResponse, statusCode: number, message: string) {
 export function createHttpServer(dataStore?: DataStore): http.Server {
   const store = dataStore || new DataStore();
   const rootDir = process.cwd();
-  const publicDir = path.join(rootDir, 'public');
-  const docDir = path.join(rootDir, 'documentacao');
 
   const server = http.createServer(async (req, res) => {
     const parsedUrl = new URL(req.url || '/', `http://${req.headers.host || 'localhost'}`);
@@ -306,28 +304,13 @@ export function createHttpServer(dataStore?: DataStore): http.Server {
       // Servico de Arquivos Estaticos (HTML, CSS, JS, etc.)
       let filePath: string;
       if (pathname === '/' || pathname === '/index.html') {
-        filePath = path.join(publicDir, 'index.html');
-      } else if (pathname === '/documentacao' || pathname === '/documentacao/') {
-        filePath = path.join(docDir, 'index.html');
-      } else if (pathname.startsWith('/documentacao/')) {
-        const subPath = pathname.substring('/documentacao/'.length) || 'index.html';
-        filePath = path.join(docDir, subPath);
-        if (!path.extname(filePath)) {
-          if (fs.existsSync(filePath + '.html')) {
-            filePath = filePath + '.html';
-          } else if (fs.existsSync(path.join(filePath, 'index.html'))) {
-            filePath = path.join(filePath, 'index.html');
-          }
-        }
+        filePath = path.join(rootDir, 'index.html');
       } else {
         let cleanPath = pathname.startsWith('/') ? pathname.substring(1) : pathname;
-        if (cleanPath.startsWith('public/')) {
-          cleanPath = cleanPath.substring('public/'.length);
-        }
         if (!cleanPath || cleanPath === 'index.html') {
-          filePath = path.join(publicDir, 'index.html');
+          filePath = path.join(rootDir, 'index.html');
         } else {
-          filePath = path.join(publicDir, cleanPath);
+          filePath = path.join(rootDir, cleanPath);
           if (!path.extname(filePath)) {
             if (fs.existsSync(filePath + '.html')) {
               filePath = filePath + '.html';
@@ -340,7 +323,7 @@ export function createHttpServer(dataStore?: DataStore): http.Server {
 
       // Seguranca contra Directory Traversal
       const resolvedPath = path.resolve(filePath);
-      if (!resolvedPath.startsWith(publicDir) && !resolvedPath.startsWith(docDir)) {
+      if (!resolvedPath.startsWith(rootDir)) {
         res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
         res.end('Acesso negado.');
         return;

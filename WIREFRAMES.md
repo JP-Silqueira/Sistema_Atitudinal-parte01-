@@ -113,3 +113,4 @@ Regra Geral: Zero emotes ou emojis no projeto
 ### 3.2 Justificativa Etica e LGPD
 - **Prevencao de Uso Punitivo:** A interface elimina inteiramente qualquer ranking, tabela de lideres ou escores depreciativos entre colegas, focando no desenvolvimento continuo.
 - **Transparencia e Contraditorio:** O estudante ou seus responsaveis podem registrar sua versao dos fatos e solicitar devolutiva acolhedora da instituicao.
+

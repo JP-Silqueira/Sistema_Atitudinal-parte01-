@@ -3,62 +3,57 @@
 Sistema Web para Avaliacao Atitudinal e Socioemocional voltado a Educacao Basica (Ensino Fundamental I, Fundamental II e Ensino Medio).
 
 O projeto transforma a observacao atitudinal em um ativo pedagogico continuo, estruturado, visual e nao punitivo, integrando as diretrizes curriculares nacionais (BNCC) e referencias internacionais:
-- Modelo holandes do Kindbegrip (CASEL): devolutiva visual em grafico de radar multidimensional, superando o parecer textual generico e eliminando ranqueamentos punitivos.
-- Abordagem finlandesa de promocao da saude escolar: foco no clima coletivo e no bem-estar institucional.
-- Sistema norte-americano EdInsights / MTSS: Sistema de Alerta Precoce que cruza frequencia (< 75% e < 85%), tarefas nao entregues e oscilacoes atitudinais em 3 niveis (Tier 1: Universal, Tier 2: Suporte Focado, Tier 3: Suporte Intensivo).
-- Conformidade estrita com a LGPD (Lei 13.709/2018, Art. 7 e Art. 14): trilha de auditoria completa, garantia de explicabilidade e canal etico de contraditorio discente.
+- **Modelo holandes do Kindbegrip (CASEL)**: devolutiva visual em grafico de radar multidimensional, superando o parecer textual generico e eliminando ranqueamentos punitivos.
+- **Abordagem finlandesa de promocao da saude escolar**: foco no clima coletivo e no bem-estar institucional.
+- **Sistema norte-americano EdInsights / MTSS**: Sistema de Alerta Precoce que cruza frequencia (< 75% e < 85%), tarefas nao entregues e oscilacoes atitudinais em 3 niveis (Tier 1: Universal, Tier 2: Suporte Focado, Tier 3: Suporte Intensivo).
+- **Conformidade estrita com a LGPD (Lei 13.709/2018, Art. 7 e Art. 14)**: trilha de auditoria completa, garantia de explicabilidade e canal etico de contraditorio discente.
 
 ---
 
-## 1. Arquitetura e Stack Tecnologica
+## 1. Artefatos de Entrega Academica
 
-Em conformidade estrita com os requisitos do projeto:
-- Backend: TypeScript puro, executado sobre Node.js nativo utilizando exclusivamente o modulo HTTP padrao (node:http). Nenhum framework externo (sem Express, Fastify ou Nest).
-- Persistencia: Armazenamento em arquivo local JSON estruturado (data/database.json) com inicializacao e geracao automatica de dados simulados (seed) para Fundamental I, Fundamental II e Ensino Medio.
-- Frontend: Paginas reais construidas em HTML5 semantico e CSS3 moderno na pasta public/. O uso de JavaScript/TypeScript no front e estritamente restrito a interacoes assincronas com a API REST nativa e ao calculo trigonometrico vetorial do SVG do Radar Kindbegrip. Nenhum framework de frontend (sem React, Vue ou Angular).
-- Padrao de Codigo: Ausencia total de emotes ou emojis em todo o codigo, textos, estilos e documentacao.
-- Documentacao Separada: Os artefatos de Mapa de Navegacao e Wireframes estao organizados na pasta documentacao/ como documentacao formal do projeto, nao integrando abas do sistema operacional.
+1. **Artefato 1: Mapa de Navegacao (Arquitetura de Informacao e RBAC)**
+   - Arquivo: `MAPA_NAVEGACAO.md` (na raiz do projeto).
+   - Diagrama da arvore estrutural de telas, fluxogramas de jornada por perfil e Matriz RBAC com amparo legal na LGPD.
+
+2. **Artefato 2: Galeria de Wireframes e Fundamentacao Ergonomica**
+   - Arquivo: `WIREFRAMES.md` (na raiz do projeto).
+   - Diagramacao textual/ASCII completa dos layouts Mobile e Desktop com fundamentacao na Lei de Fitts e nas Heuristicas de Usabilidade de Nielsen.
+
+3. **Artefato 3: Prototipo Interativo Navegavel**
+   - Paginas: `index.html`, `professor.html`, `coordenacao.html`, `estudante.html`, estilizadas com `css/style.css` e interatividade via `js/app.js` (todos na raiz do projeto).
+   - Sem abas de documentacao misturadas nas telas do sistema.
 
 ---
 
-## 2. Como Executar o Projeto
+## 2. Como Abrir e Executar o Prototipo
 
-### Pre-requisitos
-- Node.js (versao 18 ou superior instalada)
-- npm (versao 9 ou superior instalada)
+### Opcao A: Via Extensao Go Live do VS Code (Recomendada)
+1. Abra a pasta do projeto no VS Code.
+2. Clique no botao **Go Live** no canto inferior direito.
+3. O navegador abrira diretamente o portal do sistema (`index.html`), com dados e interacoes funcionando normalmente.
 
-### Instalacao e Inicializacao
-1. No terminal do sistema operacional, dentro do diretorio raiz do projeto:
-   ```bash
-   npm install
-   ```
+### Opcao B: Via Servidor HTTP Nativo em Node.js
+```bash
+# Iniciar o servidor HTTP nativo (porta 3000)
+npm start
 
-2. Iniciar o servidor HTTP nativo:
-   ```bash
-   npm start
-   # ou em modo de desenvolvimento:
-   npm run dev
-   ```
+# Executar suite de testes automatizados
+npm test
+```
 
-3. Acessar no navegador:
-   - Portal Principal: http://localhost:3000/
-   - Visao Docente: http://localhost:3000/professor.html
-   - Visao Coordenacao: http://localhost:3000/coordenacao.html
-   - Visao Estudante e Familia: http://localhost:3000/estudante.html
-   - Portal da Documentacao: http://localhost:3000/documentacao/index.html
-   - Mapa de Navegacao: http://localhost:3000/documentacao/mapa-navegacao.html
-   - Galeria de Wireframes: http://localhost:3000/documentacao/wireframes.html
-
-4. Executar os testes automatizados de unidade e integracao:
-   ```bash
-   npm test
-   ```
+### Links do Sistema no Navegador (Servidor Local)
+- **Portal Principal**: http://localhost:3000/ ou http://localhost:3000/index.html
+- **Visao Professor**: http://localhost:3000/professor.html
+- **Visao Coordenacao**: http://localhost:3000/coordenacao.html
+- **Visao Estudante e Familia**: http://localhost:3000/estudante.html
+- **Status da API**: http://localhost:3000/api/health
 
 ---
 
 ## 3. Perfis do Sistema e Funcionalidades
 
-### 3.1 Perfil Professor (Mobile-First) - /professor.html
+### 3.1 Perfil Professor (Mobile-First) - `professor.html`
 - Selecao rapida de turma (5o Ano A, 8o Ano B, 2o Ano EM).
 - Registro continuo em ate 3 cliques/toques:
   - 1o Clique: Selecao do estudante em grade de cards.
@@ -68,7 +63,7 @@ Em conformidade estrita com os requisitos do projeto:
 - Linha do tempo cronologica de evidencias com filtros por dimensao.
 - Notificacao visual de solicitacoes de dialogo pedagogico abertas por alunos ou familiares.
 
-### 3.2 Perfil Coordenacao e Nucleo Pedagogico (Desktop) - /coordenacao.html
+### 3.2 Perfil Coordenacao e Nucleo Pedagogico (Desktop) - `coordenacao.html`
 - Sistema de Alerta Precoce (Early Warning / MTSS):
   - Algoritmo que cruza assiduidade (< 75% ou < 85%), acumulo de tarefas pendentes e declinio atitudinal.
   - Classificacao nos niveis MTSS (Tier 1: Universal, Tier 2: Suporte Focado, Tier 3: Suporte Intensivo).
@@ -77,12 +72,12 @@ Em conformidade estrita com os requisitos do projeto:
   - Grafico de radar pentagonal em SVG nativo exibindo a media agregada das 5 dimensoes atitudinais.
   - Distribuicao percentual entre evidencias positivas, oportunidades de crescimento e neutras.
 - Planos de Intervencao Pedagogica (MTSS):
-  - Cadastro e monitoramento de acoes de apoio (tutoria entre pares, circulos de convivência, alinhamento com a familia).
+  - Cadastro e monitoramento de acoes de apoio (tutoria entre pares, circulos de convivencia, alinhamento com a familia).
   - Controle de prazos de revisao e status (Em Planejamento, Em Andamento, Concluido).
 - Trilha de Auditoria e Conformidade LGPD:
   - Registro imutavel com timestamp, identificacao do autor, acao executada, estudante vinculado e justificativa pedagogica expressa.
 
-### 3.3 Perfil Estudante e Responsaveis - /estudante.html
+### 3.3 Perfil Estudante e Responsaveis - `estudante.html`
 - Meu Radar Socioemocional (Kindbegrip):
   - Sobreposicao grafica entre a avaliacao observada pela escola e a autoavaliacao discente.
   - Destaque formativo para Forcas e Metas de Crescimento.
@@ -96,53 +91,32 @@ Em conformidade estrita com os requisitos do projeto:
 
 ---
 
-## 4. Artefatos de Entrega (Documentacao Separada)
-
-Localizados na pasta documentacao/:
-- documentacao/mapa-navegacao.html e documentacao/MAPA_NAVEGACAO.md:
-  - Diagrama de Arquitetura de Informacao e hierarquia de telas.
-  - Fluxogramas detalhados das jornadas por perfil.
-  - Matriz RBAC de Permissoes e controle de acesso granular em consonancia com a LGPD.
-- documentacao/wireframes.html e documentacao/WIREFRAMES.md:
-  - Wireframes de baixa e media fidelidade para Mobile (Professor e Aluno) e Desktop (Coordenacao).
-  - Analise ergonomica com base na Lei de Fitts (alvos >= 44px na zona de alcance do polegar).
-  - Justificativa teorica com base nas 10 Heuristicas de Usabilidade de Nielsen.
-
----
-
-## 5. Estrutura de Pastas do Repositorio
+## 4. Estrutura de Pastas do Repositorio
 
 ```
 .
+├── css/
+│   └── style.css            # Folha de estilos sem emojis (WCAG AA)
 ├── data/
-│   └── database.json          # Base de dados local em formato JSON
-├── documentacao/              # Documentacao formal de entrega (fora das abas do sistema)
-│   ├── index.html             # Portal da documentacao
-│   ├── mapa-navegacao.html    # Diagrama e Matriz RBAC de permissoes
-│   ├── MAPA_NAVEGACAO.md      # Versao markdown do mapa de navegacao
-│   ├── wireframes.html        # Galeria visual de wireframes e ergonomia
-│   └── WIREFRAMES.md          # Versao markdown dos wireframes
-├── public/                    # Paginas reais do sistema web
-│   ├── css/
-│   │   └── style.css          # Estilos modulares sem emojis (WCAG AA)
-│   ├── js/
-│   │   └── app.js             # JavaScript vanilla minimalista (API e SVG)
-│   ├── index.html             # Portal institucional de acesso aos perfis
-│   ├── professor.html         # Perfil Docente (Mobile-First)
-│   ├── coordenacao.html       # Perfil Coordenacao MTSS (Desktop)
-│   └── estudante.html         # Perfil Estudante e Familia
+│   └── database.json        # Base de dados local em formato JSON
+├── js/
+│   └── app.js               # JavaScript vanilla minimalista (API REST e SVG)
 ├── src/
-│   ├── dataStore.ts           # Logica de negocio, MTSS e auditoria LGPD
-│   ├── seedData.ts            # Gerador de dados iniciais simulados
-│   ├── server.ts              # Servidor HTTP nativo Node.js (sem framework)
-│   ├── types.ts               # Tipagens TypeScript estritas
-│   └── tests/                 # Testes automatizados (node:test e node:assert)
-│       ├── dataStore.test.ts  # Testes de regras de negocio e MTSS
-│       └── server.test.ts     # Testes de integracao do servidor HTTP
-├── index.html                 # Redirecionador para public/index.html
-├── package.json               # Configuracoes e scripts npm
-├── tsconfig.json              # Configuracao estrita do compilador TypeScript
-└── README.md                  # Este documento
+│   ├── dataStore.ts         # Regras de negocio, MTSS e auditoria LGPD
+│   ├── seedData.ts          # Gerador de dados iniciais simulados
+│   ├── server.ts            # Servidor HTTP nativo Node.js (sem framework)
+│   ├── types.ts             # Tipagens TypeScript estritas
+│   └── tests/               # Testes automatizados (node:test e node:assert)
+│       ├── dataStore.test.ts
+│       ├── integration.test.ts
+│       └── server.test.ts
+├── coordenacao.html         # Perfil Coordenacao MTSS (Desktop)
+├── estudante.html           # Perfil Estudante e Familiares
+├── index.html               # Portal institucional do sistema (apenas 1 no projeto)
+├── professor.html           # Perfil Docente (Mobile-First)
+├── MAPA_NAVEGACAO.md        # Entregavel: Mapa de Navegacao e RBAC
+├── WIREFRAMES.md            # Entregavel: Wireframes e Ergonomia
+├── package.json             # Configuracoes e scripts npm
+├── tsconfig.json            # Configuracao do TypeScript
+└── README.md                # Este documento
 ```
-#   p r o j e t o _ d e v _ w e b  
- 

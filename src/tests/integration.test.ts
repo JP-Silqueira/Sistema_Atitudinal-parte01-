@@ -28,14 +28,12 @@ describe('Testes de Integracao de Todas as Paginas Estaticas e Rotas', () => {
 
   const staticEndpoints = [
     { path: '/', expectedType: 'text/html' },
+    { path: '/index.html', expectedType: 'text/html' },
     { path: '/professor.html', expectedType: 'text/html' },
     { path: '/coordenacao.html', expectedType: 'text/html' },
     { path: '/estudante.html', expectedType: 'text/html' },
     { path: '/css/style.css', expectedType: 'text/css' },
-    { path: '/js/app.js', expectedType: 'application/javascript' },
-    { path: '/documentacao/index.html', expectedType: 'text/html' },
-    { path: '/documentacao/mapa-navegacao.html', expectedType: 'text/html' },
-    { path: '/documentacao/wireframes.html', expectedType: 'text/html' }
+    { path: '/js/app.js', expectedType: 'application/javascript' }
   ];
 
   for (const ep of staticEndpoints) {

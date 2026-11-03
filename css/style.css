@@ -128,11 +128,6 @@ body {
   font-weight: 600;
 }
 
-.nav-link.doc-link {
-  border-color: #93c5fd;
-  background-color: rgba(147, 197, 253, 0.15);
-}
-
 /* Layout Geral de Pagina */
 .page-container {
   max-width: 1200px;
@@ -674,3 +669,4 @@ body {
     grid-template-columns: 1fr;
   }
 }
+

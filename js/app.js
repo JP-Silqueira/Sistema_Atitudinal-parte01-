@@ -25,28 +25,367 @@ const EduApp = (() => {
       .replace(/'/g, '&#39;');
   }
 
-  async function api(path, options = {}) {
+  let localDbCache = null;
+
+  async function getLocalDb() {
+    if (localDbCache) return localDbCache;
     try {
-      const fetchOpts = {
-        method: options.method || 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          ...(options.headers || {})
-        }
-      };
-      if (options.body) {
-        fetchOpts.body = JSON.stringify(options.body);
+      const stored = localStorage.getItem('eduatitude_db_data');
+      if (stored) {
+        localDbCache = JSON.parse(stored);
+        return localDbCache;
       }
-      const res = await fetch(path, fetchOpts);
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || 'Erro na requisicao HTTP.');
+    } catch (e) {}
+
+    try {
+      const res = await fetch('data/database.json');
+      if (res.ok) {
+        localDbCache = await res.json();
+        try {
+          localStorage.setItem('eduatitude_db_data', JSON.stringify(localDbCache));
+        } catch (e) {}
+        return localDbCache;
       }
-      return data;
-    } catch (err) {
-      console.error('Falha na chamada de API:', path, err);
-      throw err;
+    } catch (e) {}
+
+    return null;
+  }
+
+  function saveLocalDb(db) {
+    localDbCache = db;
+    try {
+      localStorage.setItem('eduatitude_db_data', JSON.stringify(db));
+    } catch (e) {}
+  }
+
+  async function handleLocalApiFallback(path, options = {}) {
+    const db = await getLocalDb();
+    if (!db) return null;
+
+    const method = (options.method || 'GET').toUpperCase();
+    const url = new URL(path, 'http://localhost');
+    const pathname = url.pathname;
+    const params = url.searchParams;
+
+    if (pathname === '/api/classes' && method === 'GET') {
+      return db.classes || [];
     }
+
+    if (pathname === '/api/dimensions' && method === 'GET') {
+      return db.dimensions || [];
+    }
+
+    if (pathname === '/api/students' && method === 'GET') {
+      const classId = params.get('classId');
+      if (classId) {
+        return (db.students || []).filter(s => s.classId === classId);
+      }
+      return db.students || [];
+    }
+
+    const radarMatch = pathname.match(/^\/api\/students\/([^/]+)\/radar$/);
+    if (radarMatch && method === 'GET') {
+      const studentId = radarMatch[1];
+      const student = (db.students || []).find(s => s.id === studentId);
+      const studentObs = (db.observations || []).filter(o => o.studentId === studentId);
+      
+      const schoolScores = {};
+      const dimensions = ['responsabilidade', 'colaboracao', 'autonomia', 'participacao', 'respeito'];
+      dimensions.forEach(dim => {
+        const forDim = studentObs.filter(o => o.dimensionId === dim);
+        if (forDim.length === 0) {
+          schoolScores[dim] = 3.5;
+        } else {
+          let score = 3.0;
+          forDim.forEach(o => {
+            if (o.polarity === 'positiva') score += 0.5;
+            else if (o.polarity === 'oportunidade') score -= 0.5;
+          });
+          schoolScores[dim] = Math.max(1, Math.min(5, Math.round(score * 10) / 10));
+        }
+      });
+
+      const selfEval = (db.selfEvaluations || []).filter(s => s.studentId === studentId).pop();
+      const selfScores = selfEval ? selfEval.scores : {
+        responsabilidade: 4, colaboracao: 4, autonomia: 3.5, participacao: 4, respeito: 4.5
+      };
+
+      const sortedDims = [...dimensions].sort((a, b) => (schoolScores[b] || 0) - (schoolScores[a] || 0));
+      return {
+        studentId,
+        studentName: student ? student.name : studentId,
+        className: student ? student.className : '',
+        schoolScores,
+        selfScores,
+        strengths: sortedDims.slice(0, 2),
+        growthAreas: sortedDims.slice(-2).reverse(),
+        totalObservations: studentObs.length,
+        hasSelfEvaluation: !!selfEval
+      };
+    }
+
+    if (pathname === '/api/observations' && method === 'GET') {
+      const classId = params.get('classId');
+      const studentId = params.get('studentId');
+      let list = [...(db.observations || [])];
+      if (classId) list = list.filter(o => o.classId === classId);
+      if (studentId) list = list.filter(o => o.studentId === studentId);
+      return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    if (pathname === '/api/observations' && method === 'POST') {
+      const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+      const newObs = {
+        id: 'obs-' + Date.now(),
+        studentId: body.studentId,
+        studentName: body.studentName || 'Estudante',
+        classId: body.classId,
+        className: body.className || '',
+        dimensionId: body.dimensionId,
+        polarity: body.polarity,
+        note: body.note || '',
+        registeredBy: body.registeredBy || 'Docente',
+        createdAt: new Date().toISOString()
+      };
+      db.observations = db.observations || [];
+      db.observations.unshift(newObs);
+      saveLocalDb(db);
+      return newObs;
+    }
+
+    if (pathname === '/api/alerts' && method === 'GET') {
+      const classId = params.get('classId');
+      let students = db.students || [];
+      if (classId) students = students.filter(s => s.classId === classId);
+
+      return students.map(s => {
+        const obs = (db.observations || []).filter(o => o.studentId === s.id);
+        const oppCount = obs.filter(o => o.polarity === 'oportunidade').length;
+        const posCount = obs.filter(o => o.polarity === 'positiva').length;
+        const attScore = Math.max(1, Math.min(5, Math.round((3.0 + posCount * 0.4 - oppCount * 0.5) * 10) / 10));
+
+        let tier = 'Tier 1';
+        let action = 'Acompanhamento Universal';
+        const indicators = [];
+
+        if (s.attendanceRate < 75 || (s.missedAssignments >= 4 && attScore < 3.0)) {
+          tier = 'Tier 3';
+          action = 'Intervencao Intensiva Imediata';
+          if (s.attendanceRate < 75) indicators.push(`Frequencia critica: ${s.attendanceRate}%`);
+          if (s.missedAssignments >= 4) indicators.push(`${s.missedAssignments} tarefas pendentes`);
+          if (attScore < 3.0) indicators.push(`Score atitudinal baixo (${attScore})`);
+        } else if (s.attendanceRate < 85 || s.missedAssignments >= 2 || attScore < 3.5) {
+          tier = 'Tier 2';
+          action = 'Plano de Apoio Focalizado';
+          if (s.attendanceRate < 85) indicators.push(`Atencao a frequencia: ${s.attendanceRate}%`);
+          if (s.missedAssignments >= 2) indicators.push(`${s.missedAssignments} tarefas pendentes`);
+          if (attScore < 3.5) indicators.push(`Oscilacao atitudinal (${attScore})`);
+        } else {
+          indicators.push('Desenvolvimento socioemocional estavel');
+        }
+
+        return {
+          studentId: s.id,
+          studentName: s.name,
+          classId: s.classId,
+          className: s.className,
+          attendanceRate: s.attendanceRate,
+          missedAssignments: s.missedAssignments,
+          attitudinalScore: attScore,
+          tier,
+          indicators,
+          strategicAction: action
+        };
+      }).sort((a, b) => {
+        const order = { 'Tier 3': 1, 'Tier 2': 2, 'Tier 1': 3 };
+        return (order[a.tier] || 3) - (order[b.tier] || 3);
+      });
+    }
+
+    if (pathname === '/api/climate' && method === 'GET') {
+      const classId = params.get('classId');
+      let obs = db.observations || [];
+      if (classId) obs = obs.filter(o => o.classId === classId);
+
+      const total = obs.length;
+      const positiveCount = obs.filter(o => o.polarity === 'positiva').length;
+      const opportunityCount = obs.filter(o => o.polarity === 'oportunidade').length;
+      const neutralCount = obs.filter(o => o.polarity === 'neutra').length;
+      const positiveRate = total > 0 ? Math.round((positiveCount / total) * 100) : 80;
+
+      const dimensionAverages = {};
+      ['responsabilidade', 'colaboracao', 'autonomia', 'participacao', 'respeito'].forEach(dim => {
+        const dimObs = obs.filter(o => o.dimensionId === dim);
+        if (dimObs.length === 0) {
+          dimensionAverages[dim] = 3.5;
+        } else {
+          let score = 3.0;
+          dimObs.forEach(o => {
+            if (o.polarity === 'positiva') score += 0.3;
+            else if (o.polarity === 'oportunidade') score -= 0.3;
+          });
+          dimensionAverages[dim] = Math.max(1, Math.min(5, Math.round(score * 10) / 10));
+        }
+      });
+
+      return {
+        totalObservations: total,
+        positiveCount,
+        opportunityCount,
+        neutralCount,
+        positiveRate,
+        dimensionAverages
+      };
+    }
+
+    if (pathname === '/api/interventions' && method === 'GET') {
+      return db.interventions || [];
+    }
+
+    if (pathname === '/api/interventions' && method === 'POST') {
+      const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+      const newInt = {
+        id: 'int-' + Date.now(),
+        studentId: body.studentId,
+        studentName: body.studentName || 'Estudante',
+        classId: body.classId || '',
+        className: body.className || '',
+        tier: body.tier || 'Tier 2',
+        title: body.title,
+        strategy: body.strategy,
+        targetDimension: body.targetDimension,
+        responsible: body.responsible || 'Coordenacao',
+        status: 'ativa',
+        reviewDate: body.reviewDate || new Date().toISOString(),
+        createdAt: new Date().toISOString()
+      };
+      db.interventions = db.interventions || [];
+      db.interventions.unshift(newInt);
+      saveLocalDb(db);
+      return newInt;
+    }
+
+    const intPatchMatch = pathname.match(/^\/api\/interventions\/([^/]+)$/);
+    if (intPatchMatch && method === 'PATCH') {
+      const id = intPatchMatch[1];
+      const item = (db.interventions || []).find(i => i.id === id);
+      if (item) {
+        const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+        if (body.status) item.status = body.status;
+        saveLocalDb(db);
+        return item;
+      }
+    }
+
+    if (pathname === '/api/audit' && method === 'GET') {
+      return db.auditLogs || [];
+    }
+
+    if (pathname === '/api/dialogues' && method === 'GET') {
+      const studentId = params.get('studentId');
+      const status = params.get('status');
+      let list = db.dialogueRequests || [];
+      if (studentId) list = list.filter(d => d.studentId === studentId);
+      if (status) list = list.filter(d => d.status === status);
+      return list;
+    }
+
+    if (pathname === '/api/dialogues' && method === 'POST') {
+      const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+      const newDiag = {
+        id: 'diag-' + Date.now(),
+        observationId: body.observationId || '',
+        studentId: body.studentId,
+        studentName: body.studentName || 'Estudante',
+        authorType: body.authorType || 'Estudante',
+        authorName: body.authorName,
+        message: body.message,
+        status: 'aberto',
+        response: null,
+        respondedBy: null,
+        createdAt: new Date().toISOString(),
+        respondedAt: null
+      };
+      db.dialogueRequests = db.dialogueRequests || [];
+      db.dialogueRequests.unshift(newDiag);
+      saveLocalDb(db);
+      return newDiag;
+    }
+
+    const diagPatchMatch = pathname.match(/^\/api\/dialogues\/([^/]+)$/);
+    if (diagPatchMatch && method === 'PATCH') {
+      const id = diagPatchMatch[1];
+      const item = (db.dialogueRequests || []).find(d => d.id === id);
+      if (item) {
+        const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+        if (body.response) item.response = body.response;
+        if (body.respondedBy) item.respondedBy = body.respondedBy;
+        item.status = 'respondido';
+        item.respondedAt = new Date().toISOString();
+        saveLocalDb(db);
+        return item;
+      }
+    }
+
+    if (pathname === '/api/self-evaluations' && method === 'POST') {
+      const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+      const newEval = {
+        id: 'seval-' + Date.now(),
+        studentId: body.studentId,
+        studentName: body.studentName || 'Estudante',
+        scores: body.scores || {},
+        reflection: body.reflection || '',
+        submittedAt: new Date().toISOString()
+      };
+      db.selfEvaluations = db.selfEvaluations || [];
+      db.selfEvaluations.unshift(newEval);
+      saveLocalDb(db);
+      return newEval;
+    }
+
+    return null;
+  }
+
+  async function api(path, options = {}) {
+    const fetchOpts = {
+      method: options.method || 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      }
+    };
+    if (options.body) {
+      fetchOpts.body = JSON.stringify(options.body);
+    }
+
+    try {
+      let res = await fetch(path, fetchOpts);
+      if (res.ok) {
+        return await res.json();
+      }
+      if (!res.ok && window.location.port && window.location.port !== '3000') {
+        const backendRes = await fetch(`http://localhost:3000${path}`, fetchOpts).catch(() => null);
+        if (backendRes && backendRes.ok) {
+          return await backendRes.json();
+        }
+      }
+    } catch (err) {
+      if (window.location.port && window.location.port !== '3000') {
+        try {
+          const backendRes = await fetch(`http://localhost:3000${path}`, fetchOpts);
+          if (backendRes.ok) {
+            return await backendRes.json();
+          }
+        } catch (e) {}
+      }
+    }
+
+    const fallbackData = await handleLocalApiFallback(path, options);
+    if (fallbackData !== null && fallbackData !== undefined) {
+      return fallbackData;
+    }
+
+    throw new Error('Falha na requisicao HTTP.');
   }
 
   function showToast(containerId, message, type = 'success') {
