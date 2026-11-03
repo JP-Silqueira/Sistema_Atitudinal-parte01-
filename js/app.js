@@ -30,7 +30,7 @@ const EduApp = (() => {
   async function getLocalDb() {
     if (localDbCache) return localDbCache;
     try {
-      const stored = localStorage.getItem('eduatitude_db_data');
+      const stored = localStorage.getItem('eduatitude_db_v2');
       if (stored) {
         localDbCache = JSON.parse(stored);
         return localDbCache;
@@ -42,7 +42,7 @@ const EduApp = (() => {
       if (res.ok) {
         localDbCache = await res.json();
         try {
-          localStorage.setItem('eduatitude_db_data', JSON.stringify(localDbCache));
+          localStorage.setItem('eduatitude_db_v2', JSON.stringify(localDbCache));
         } catch (e) {}
         return localDbCache;
       }
@@ -54,7 +54,7 @@ const EduApp = (() => {
   function saveLocalDb(db) {
     localDbCache = db;
     try {
-      localStorage.setItem('eduatitude_db_data', JSON.stringify(db));
+      localStorage.setItem('eduatitude_db_v2', JSON.stringify(db));
     } catch (e) {}
   }
 
@@ -86,41 +86,63 @@ const EduApp = (() => {
     const radarMatch = pathname.match(/^\/api\/students\/([^/]+)\/radar$/);
     if (radarMatch && method === 'GET') {
       const studentId = radarMatch[1];
-      const student = (db.students || []).find(s => s.id === studentId);
+      const student = (db.students || []).find(s => s.id === studentId) || {
+        id: studentId,
+        name: 'Estudante',
+        attendanceRate: 95,
+        missingAssignments: 0,
+        guardianName: 'Responsavel'
+      };
       const studentObs = (db.observations || []).filter(o => o.studentId === studentId);
       
-      const schoolScores = {};
-      const dimensions = ['responsabilidade', 'colaboracao', 'autonomia', 'participacao', 'respeito'];
-      dimensions.forEach(dim => {
+      const dims = ['responsabilidade', 'colaboracao', 'autonomia', 'participacao', 'respeito'];
+      const teacherRatings = {
+        responsabilidade: 3.5, colaboracao: 3.5, autonomia: 3.5, participacao: 3.5, respeito: 3.5
+      };
+      dims.forEach(dim => {
         const forDim = studentObs.filter(o => o.dimensionId === dim);
-        if (forDim.length === 0) {
-          schoolScores[dim] = 3.5;
-        } else {
-          let score = 3.0;
+        if (forDim.length > 0) {
+          let sum = 0;
           forDim.forEach(o => {
-            if (o.polarity === 'positiva') score += 0.5;
-            else if (o.polarity === 'oportunidade') score -= 0.5;
+            if (o.polarity === 'positiva') sum += 5.0;
+            else if (o.polarity === 'neutra') sum += 3.5;
+            else sum += 2.0;
           });
-          schoolScores[dim] = Math.max(1, Math.min(5, Math.round(score * 10) / 10));
+          teacherRatings[dim] = Number((sum / forDim.length).toFixed(1));
         }
       });
 
-      const selfEval = (db.selfEvaluations || []).filter(s => s.studentId === studentId).pop();
-      const selfScores = selfEval ? selfEval.scores : {
-        responsabilidade: 4, colaboracao: 4, autonomia: 3.5, participacao: 4, respeito: 4.5
+      const selfEval = (db.selfEvaluations || [])
+        .filter(s => s.studentId === studentId)
+        .sort((a, b) => new Date(b.submittedAt || 0).getTime() - new Date(a.submittedAt || 0).getTime())[0];
+
+      const selfRatings = selfEval && (selfEval.ratings || selfEval.scores) ? (selfEval.ratings || selfEval.scores) : {
+        responsabilidade: 4, colaboracao: 4, autonomia: 4, participacao: 4, respeito: 4
       };
 
-      const sortedDims = [...dimensions].sort((a, b) => (schoolScores[b] || 0) - (schoolScores[a] || 0));
+      const dimsWithScores = dims.map(dim => ({ dim, score: teacherRatings[dim] }));
+      dimsWithScores.sort((a, b) => b.score - a.score);
+
+      let strengths = [];
+      let growthAreas = [];
+      if (studentObs.length === 0) {
+        strengths = dimsWithScores.slice(0, 2).map(d => d.dim);
+        growthAreas = [];
+      } else {
+        strengths = dimsWithScores.filter(d => d.score >= 3.5).slice(0, 2).map(d => d.dim);
+        growthAreas = dimsWithScores.filter(d => d.score < 3.5).map(d => d.dim);
+        if (growthAreas.length === 0) growthAreas = [dimsWithScores[dimsWithScores.length - 1].dim];
+        if (strengths.length === 0) strengths = [dimsWithScores[0].dim];
+      }
+
       return {
-        studentId,
-        studentName: student ? student.name : studentId,
-        className: student ? student.className : '',
-        schoolScores,
-        selfScores,
-        strengths: sortedDims.slice(0, 2),
-        growthAreas: sortedDims.slice(-2).reverse(),
+        student,
         totalObservations: studentObs.length,
-        hasSelfEvaluation: !!selfEval
+        teacherRatings,
+        selfRatings,
+        strengths,
+        growthAreas,
+        lastSelfEvaluationDate: selfEval ? selfEval.submittedAt : null
       };
     }
 
@@ -130,21 +152,28 @@ const EduApp = (() => {
       let list = [...(db.observations || [])];
       if (classId) list = list.filter(o => o.classId === classId);
       if (studentId) list = list.filter(o => o.studentId === studentId);
-      return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      return list.sort((a, b) => new Date(b.timestamp || b.createdAt || 0) - new Date(a.timestamp || a.createdAt || 0));
     }
 
     if (pathname === '/api/observations' && method === 'POST') {
       const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
+      const foundStudent = (db.students || []).find(s => s.id === body.studentId);
+      const studentName = body.studentName || (foundStudent ? foundStudent.name : 'Estudante');
+      const classId = body.classId || (foundStudent ? foundStudent.classId : '');
+      const className = body.className || (foundStudent ? foundStudent.className : '');
       const newObs = {
         id: 'obs-' + Date.now(),
         studentId: body.studentId,
-        studentName: body.studentName || 'Estudante',
-        classId: body.classId,
-        className: body.className || '',
+        studentName,
+        classId,
+        className,
         dimensionId: body.dimensionId,
         polarity: body.polarity,
         note: body.note || '',
-        registeredBy: body.registeredBy || 'Docente',
+        teacherId: body.teacherId || 'prof-01',
+        teacherName: body.teacherName || body.registeredBy || 'Docente',
+        registeredBy: body.teacherName || body.registeredBy || 'Docente',
+        timestamp: new Date().toISOString(),
         createdAt: new Date().toISOString()
       };
       db.observations = db.observations || [];
@@ -168,17 +197,17 @@ const EduApp = (() => {
         let action = 'Acompanhamento Universal';
         const indicators = [];
 
-        if (s.attendanceRate < 75 || (s.missedAssignments >= 4 && attScore < 3.0)) {
+        if (s.attendanceRate < 75 || (s.missingAssignments >= 4 && attScore < 3.0)) {
           tier = 'Tier 3';
           action = 'Intervencao Intensiva Imediata';
           if (s.attendanceRate < 75) indicators.push(`Frequencia critica: ${s.attendanceRate}%`);
-          if (s.missedAssignments >= 4) indicators.push(`${s.missedAssignments} tarefas pendentes`);
+          if (s.missingAssignments >= 4) indicators.push(`${s.missingAssignments} tarefas pendentes`);
           if (attScore < 3.0) indicators.push(`Score atitudinal baixo (${attScore})`);
-        } else if (s.attendanceRate < 85 || s.missedAssignments >= 2 || attScore < 3.5) {
+        } else if (s.attendanceRate < 85 || s.missingAssignments >= 2 || attScore < 3.5) {
           tier = 'Tier 2';
           action = 'Plano de Apoio Focalizado';
           if (s.attendanceRate < 85) indicators.push(`Atencao a frequencia: ${s.attendanceRate}%`);
-          if (s.missedAssignments >= 2) indicators.push(`${s.missedAssignments} tarefas pendentes`);
+          if (s.missingAssignments >= 2) indicators.push(`${s.missingAssignments} tarefas pendentes`);
           if (attScore < 3.5) indicators.push(`Oscilacao atitudinal (${attScore})`);
         } else {
           indicators.push('Desenvolvimento socioemocional estavel');
@@ -190,7 +219,7 @@ const EduApp = (() => {
           classId: s.classId,
           className: s.className,
           attendanceRate: s.attendanceRate,
-          missedAssignments: s.missedAssignments,
+          missedAssignments: s.missingAssignments || 0,
           attitudinalScore: attScore,
           tier,
           indicators,
@@ -204,37 +233,50 @@ const EduApp = (() => {
 
     if (pathname === '/api/climate' && method === 'GET') {
       const classId = params.get('classId');
-      let obs = db.observations || [];
-      if (classId) obs = obs.filter(o => o.classId === classId);
+      let students = db.students || [];
+      if (classId) students = students.filter(s => s.classId === classId);
+      const studentIds = new Set(students.map(s => s.id));
+      let obs = (db.observations || []).filter(o => studentIds.has(o.studentId));
 
       const total = obs.length;
       const positiveCount = obs.filter(o => o.polarity === 'positiva').length;
       const opportunityCount = obs.filter(o => o.polarity === 'oportunidade').length;
       const neutralCount = obs.filter(o => o.polarity === 'neutra').length;
-      const positiveRate = total > 0 ? Math.round((positiveCount / total) * 100) : 80;
+      const positivePct = total > 0 ? Number(((positiveCount / total) * 100).toFixed(1)) : 0;
+      const opportunityPct = total > 0 ? Number(((opportunityCount / total) * 100).toFixed(1)) : 0;
+      const neutralPct = total > 0 ? Number(((neutralCount / total) * 100).toFixed(1)) : 0;
 
-      const dimensionAverages = {};
+      const radarDimensions = {
+        responsabilidade: 3.5, colaboracao: 3.5, autonomia: 3.5, participacao: 3.5, respeito: 3.5
+      };
       ['responsabilidade', 'colaboracao', 'autonomia', 'participacao', 'respeito'].forEach(dim => {
         const dimObs = obs.filter(o => o.dimensionId === dim);
-        if (dimObs.length === 0) {
-          dimensionAverages[dim] = 3.5;
-        } else {
-          let score = 3.0;
+        if (dimObs.length > 0) {
+          let sum = 0;
           dimObs.forEach(o => {
-            if (o.polarity === 'positiva') score += 0.3;
-            else if (o.polarity === 'oportunidade') score -= 0.3;
+            if (o.polarity === 'positiva') sum += 5.0;
+            else if (o.polarity === 'neutra') sum += 3.5;
+            else sum += 2.0;
           });
-          dimensionAverages[dim] = Math.max(1, Math.min(5, Math.round(score * 10) / 10));
+          radarDimensions[dim] = Number((sum / dimObs.length).toFixed(1));
         }
       });
 
       return {
+        totalStudents: students.length,
         totalObservations: total,
-        positiveCount,
-        opportunityCount,
-        neutralCount,
-        positiveRate,
-        dimensionAverages
+        counts: {
+          positive: positiveCount,
+          opportunity: opportunityCount,
+          neutral: neutralCount
+        },
+        percentages: {
+          positive: positivePct,
+          opportunity: opportunityPct,
+          neutral: neutralPct
+        },
+        climateIndex: positivePct,
+        radarDimensions
       };
     }
 
@@ -286,7 +328,7 @@ const EduApp = (() => {
       const status = params.get('status');
       let list = db.dialogueRequests || [];
       if (studentId) list = list.filter(d => d.studentId === studentId);
-      if (status) list = list.filter(d => d.status === status);
+      if (status) list = list.filter(d => (d.status || '').toLowerCase() === status.toLowerCase());
       return list;
     }
 
@@ -300,7 +342,7 @@ const EduApp = (() => {
         authorType: body.authorType || 'Estudante',
         authorName: body.authorName,
         message: body.message,
-        status: 'aberto',
+        status: 'Aberto',
         response: null,
         respondedBy: null,
         createdAt: new Date().toISOString(),
@@ -320,7 +362,7 @@ const EduApp = (() => {
         const body = options.body ? (typeof options.body === 'string' ? JSON.parse(options.body) : options.body) : {};
         if (body.response) item.response = body.response;
         if (body.respondedBy) item.respondedBy = body.respondedBy;
-        item.status = 'respondido';
+        item.status = 'Respondido';
         item.respondedAt = new Date().toISOString();
         saveLocalDb(db);
         return item;
@@ -333,8 +375,10 @@ const EduApp = (() => {
         id: 'seval-' + Date.now(),
         studentId: body.studentId,
         studentName: body.studentName || 'Estudante',
-        scores: body.scores || {},
-        reflection: body.reflection || '',
+        period: body.period || '1o Bimestre / 2026',
+        ratings: body.ratings || body.scores || {},
+        scores: body.ratings || body.scores || {},
+        reflectionText: body.reflectionText || body.reflection || '',
         submittedAt: new Date().toISOString()
       };
       db.selfEvaluations = db.selfEvaluations || [];
@@ -510,6 +554,7 @@ const EduApp = (() => {
     const notaObs = document.getElementById('nota-observacao');
     const labelEstudante = document.getElementById('estudante-selecionado-label');
     const labelDimensao = document.getElementById('dimensao-selecionada-label');
+    const labelPolaridade = document.getElementById('polaridade-selecionada-label');
 
     async function carregarTurmas() {
       try {
@@ -601,7 +646,7 @@ const EduApp = (() => {
       
       const turmaStudentIds = new Set(state.estudantes.map(s => s.id));
       const turmaDialogos = dialogos.filter(d => turmaStudentIds.has(d.studentId));
-      const pendentes = turmaDialogos.filter(d => d.status === 'Aberto');
+      const pendentes = turmaDialogos.filter(d => (d.status || '').toLowerCase() === 'aberto');
 
       if (pendentes.length > 0) {
         alertasBox.style.display = 'block';
@@ -620,7 +665,7 @@ const EduApp = (() => {
         <div style="border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:0.85rem; background:#ffffff;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
             <strong>${escapeHtml(d.studentName)} (${escapeHtml(d.authorType)}: ${escapeHtml(d.authorName)})</strong>
-            <span class="tier-badge ${d.status === 'Aberto' ? 'tier-2' : 'tier-1'}">${escapeHtml(d.status)}</span>
+            <span class="tier-badge ${(d.status || '').toLowerCase() === 'aberto' ? 'tier-2' : 'tier-1'}">${escapeHtml(d.status)}</span>
           </div>
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">${escapeHtml(d.message)}</p>
           ${d.response ? `
@@ -641,40 +686,53 @@ const EduApp = (() => {
       await verificarDialogosTurma();
     };
 
-    // Submissao do registro atitudinal (suporta fluxo agil de 3 cliques e botao de confirmacao com nota)
-    async function submeterRegistro(origem = 'botao') {
+    // Submissao do registro atitudinal
+    async function submeterRegistro() {
       if (!state.estudanteId) {
-        if (origem === 'botao') showToast('toast-box', 'Selecione o estudante no Passo 1.', 'error');
+        showToast('toast-box', 'Selecione o estudante no Passo 1.', 'error');
         return;
       }
       if (!state.dimensaoId) {
-        if (origem === 'botao') showToast('toast-box', 'Selecione a dimensao no Passo 2.', 'error');
+        showToast('toast-box', 'Selecione a dimensao no Passo 2.', 'error');
         return;
       }
       if (!state.polaridade) {
-        if (origem === 'botao') showToast('toast-box', 'Selecione a polaridade no Passo 3.', 'error');
+        showToast('toast-box', 'Selecione a polaridade no Passo 3.', 'error');
         return;
       }
 
       try {
+        const turmaObj = (state.turmas || []).find(t => t.id === state.turmaAtiva);
         await api('/api/observations', {
           method: 'POST',
           body: {
             studentId: state.estudanteId,
+            studentName: state.estudanteNome,
+            classId: state.turmaAtiva,
+            className: turmaObj ? turmaObj.name : '',
             dimensionId: state.dimensaoId,
             polarity: state.polaridade,
             note: notaObs.value,
             teacherId: 'prof-01',
-            teacherName: 'Prof. Carlos Eduardo'
+            teacherName: 'Prof. Carlos Eduardo',
+            registeredBy: 'Prof. Carlos Eduardo'
           }
         });
 
         const rotuloPol = state.polaridade === 'positiva' ? 'Positiva' : state.polaridade === 'oportunidade' ? 'Oportunidade' : 'Neutra';
         showToast('toast-box', `Evidencia [${rotuloPol}] de ${state.dimensaoId} registrada com sucesso para ${state.estudanteNome}!`);
         
-        // Limpa polaridade e anotacao para proximo registro agil
+        // Limpa estado, campos e selecoes visuais para o proximo registro
         notaObs.value = '';
         state.polaridade = '';
+        state.dimensaoId = '';
+        state.estudanteId = '';
+        state.estudanteNome = '';
+        labelEstudante.textContent = 'Nenhum estudante selecionado';
+        labelDimensao.textContent = 'Nenhuma dimensao selecionada';
+        if (labelPolaridade) labelPolaridade.textContent = 'Nenhuma polaridade selecionada';
+        document.querySelectorAll('.select-card').forEach(b => b.classList.remove('selected'));
+        document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('selected'));
         document.querySelectorAll('.pol-btn').forEach(b => b.classList.remove('selected'));
         
         await carregarTimeline();
@@ -688,7 +746,14 @@ const EduApp = (() => {
       state.turmaAtiva = e.target.value;
       state.estudanteId = '';
       state.estudanteNome = '';
+      state.dimensaoId = '';
+      state.polaridade = '';
       labelEstudante.textContent = 'Nenhum estudante selecionado';
+      labelDimensao.textContent = 'Nenhuma dimensao selecionada';
+      if (labelPolaridade) labelPolaridade.textContent = 'Nenhuma polaridade selecionada';
+      notaObs.value = '';
+      document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('selected'));
+      document.querySelectorAll('.pol-btn').forEach(b => b.classList.remove('selected'));
       await carregarDadosTurma();
     });
 
@@ -701,24 +766,24 @@ const EduApp = (() => {
       });
     });
 
-    // Clique 3: Tocar na polaridade
-    // Se o estudante e a dimensao ja estiverem selecionados e a gaveta de notas nao tiver texto digitado,
-    // o 3o toque completa e salva a observacao instantaneamente (usabilidade em ate 3 cliques)!
+    // Clique 3: Tocar na polaridade (mantem a selecao estavel e visivel)
     document.querySelectorAll('.pol-btn').forEach(btn => {
-      btn.addEventListener('click', async () => {
+      btn.addEventListener('click', () => {
         document.querySelectorAll('.pol-btn').forEach(b => b.classList.remove('selected'));
         btn.classList.add('selected');
         state.polaridade = btn.dataset.pol;
-
-        if (state.estudanteId && state.dimensaoId && !notaObs.value.trim()) {
-          await submeterRegistro('triad');
+        const rotulo = btn.dataset.pol === 'positiva' ? '[Positiva] Evidencia de Forca' :
+                       btn.dataset.pol === 'oportunidade' ? '[Oportunidade] Ponto de Crescimento' :
+                       '[Neutra] Factual / Observacional';
+        if (labelPolaridade) {
+          labelPolaridade.textContent = `Selecionada: ${rotulo}`;
         }
       });
     });
 
     filtroDimensao.addEventListener('change', carregarTimeline);
 
-    btnConfirmar.addEventListener('click', () => submeterRegistro('botao'));
+    btnConfirmar.addEventListener('click', () => submeterRegistro());
 
     btnLimpar.addEventListener('click', () => {
       state.estudanteId = '';
@@ -727,6 +792,7 @@ const EduApp = (() => {
       state.polaridade = '';
       labelEstudante.textContent = 'Nenhum estudante selecionado';
       labelDimensao.textContent = 'Nenhuma dimensao selecionada';
+      if (labelPolaridade) labelPolaridade.textContent = 'Nenhuma polaridade selecionada';
       notaObs.value = '';
       document.querySelectorAll('.select-card').forEach(b => b.classList.remove('selected'));
       document.querySelectorAll('.dim-btn').forEach(b => b.classList.remove('selected'));
@@ -981,28 +1047,36 @@ const EduApp = (() => {
     let estudanteAtivoId = '';
 
     async function carregarListaEstudantes() {
-      const students = await api('/api/students');
-      selectEstudante.innerHTML = '';
-      students.forEach((s, idx) => {
-        const opt = document.createElement('option');
-        opt.value = s.id;
-        opt.textContent = `${s.name} (${s.enrollmentNumber})`;
-        if (idx === 0) opt.selected = true;
-        selectEstudante.appendChild(opt);
-      });
+      try {
+        const students = await api('/api/students');
+        selectEstudante.innerHTML = '';
+        students.forEach((s, idx) => {
+          const opt = document.createElement('option');
+          opt.value = s.id;
+          opt.textContent = `${s.name} (${s.enrollmentNumber})`;
+          if (idx === 0) opt.selected = true;
+          selectEstudante.appendChild(opt);
+        });
 
-      if (students.length > 0) {
-        estudanteAtivoId = students[0].id;
-        await carregarPainelEstudante();
+        if (students.length > 0) {
+          estudanteAtivoId = students[0].id;
+          await carregarPainelEstudante();
+        }
+      } catch (e) {
+        showToast('toast-box-estudante', 'Erro ao carregar dados dos estudantes.', 'error');
       }
     }
 
     async function carregarPainelEstudante() {
       try {
         const radarData = await api(`/api/students/${estudanteAtivoId}/radar`);
-        const student = radarData.student;
+        const student = radarData.student || {};
 
-        dadosFrequencia.textContent = `Assiduidade: ${student.attendanceRate}% | Tarefas pendentes: ${student.missingAssignments} | Responsavel cadastrado: ${student.guardianName}`;
+        const attendance = student.attendanceRate !== undefined ? student.attendanceRate : '--';
+        const missing = student.missingAssignments !== undefined ? student.missingAssignments : (student.missedAssignments !== undefined ? student.missedAssignments : 0);
+        const guardian = student.guardianName || 'Nao informado';
+
+        dadosFrequencia.textContent = `Assiduidade: ${attendance}% | Tarefas pendentes: ${missing} | Responsavel cadastrado: ${guardian}`;
 
         if (radarData.strengths && radarData.strengths.length > 0) {
           textoForcas.textContent = radarData.strengths.map(d => d.toUpperCase()).join(' e ');
@@ -1037,7 +1111,7 @@ const EduApp = (() => {
         await carregarObservacoesEDialogos();
 
       } catch (e) {
-        showToast('toast-box-estudante', 'Erro ao carregar dados do estudante.', 'error');
+        showToast('toast-box-estudante', 'Erro ao carregar dados do estudante: ' + (e.message || ''), 'error');
       }
     }
 
@@ -1059,13 +1133,13 @@ const EduApp = (() => {
           <article class="timeline-item ${o.polarity}">
             <div class="timeline-header">
               <span class="timeline-student">${escapeHtml(o.dimensionId.toUpperCase())}</span>
-              <span class="timeline-date">${formatDate(o.timestamp)}</span>
+              <span class="timeline-date">${formatDate(o.timestamp || o.createdAt)}</span>
             </div>
             <div>
               <span class="polarity-badge ${polClass}">${polNome}</span>
             </div>
             ${o.note ? `<p class="timeline-note">${escapeHtml(o.note)}</p>` : ''}
-            <div class="timeline-author">Educador: ${escapeHtml(o.teacherName)}</div>
+            <div class="timeline-author">Educador: ${escapeHtml(o.teacherName || o.registeredBy || 'Docente')}</div>
 
             ${dialVinculado ? `
               <div style="margin-top:0.6rem; padding:0.5rem 0.75rem; background:#f0f9ff; border:1px solid #bae6fd; border-radius:var(--radius-sm); font-size:0.8rem;">

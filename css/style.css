@@ -535,22 +535,43 @@ body {
   transition: all 0.15s;
 }
 
-.polarity-btn.pos:hover, .polarity-btn.pos.selected {
+.polarity-btn.pos:hover {
   border-color: var(--color-success);
   background-color: var(--color-success-bg);
   color: var(--color-success);
 }
 
-.polarity-btn.opt:hover, .polarity-btn.opt.selected {
+.polarity-btn.pos.selected {
+  border-color: var(--color-success);
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+  box-shadow: 0 0 0 2px var(--color-success);
+}
+
+.polarity-btn.opt:hover {
   border-color: var(--color-warning);
   background-color: var(--color-warning-bg);
   color: var(--color-warning);
 }
 
-.polarity-btn.neu:hover, .polarity-btn.neu.selected {
+.polarity-btn.opt.selected {
+  border-color: var(--color-warning);
+  background-color: var(--color-warning-bg);
+  color: var(--color-warning);
+  box-shadow: 0 0 0 2px var(--color-warning);
+}
+
+.polarity-btn.neu:hover {
   border-color: var(--color-neutral);
   background-color: var(--color-neutral-bg);
   color: var(--color-neutral);
+}
+
+.polarity-btn.neu.selected {
+  border-color: var(--color-neutral);
+  background-color: var(--color-neutral-bg);
+  color: var(--color-neutral);
+  box-shadow: 0 0 0 2px var(--color-neutral);
 }
 
 /* Indicadores de Clima Escolar e Grafico Radar Kindbegrip */
