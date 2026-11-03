@@ -5,17 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Perfil Docente - Registro Rapido | EduAtitude</title>
   <link rel="stylesheet" href="css/style.css">
-  <script>
-    (function() {
-      try {
-        var saved = localStorage.getItem('eduatitude_theme');
-        var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (saved === 'dark' || (!saved && prefersDark)) {
-          document.documentElement.setAttribute('data-theme', 'dark');
-        }
-      } catch (e) {}
-    })();
-  </script>
 </head>
 <body>
 
@@ -31,9 +20,6 @@
         <a href="professor.html" class="nav-link active">Visao Professor</a>
         <a href="coordenacao.html" class="nav-link">Visao Coordenacao</a>
         <a href="estudante.html" class="nav-link">Visao Estudante</a>
-        <button type="button" id="btn-theme-toggle" class="btn btn-sm btn-secondary theme-toggle-btn" aria-label="Alternar tema escuro e claro">
-          <img src="assets/icons/moon.svg" alt="Modo Escuro" class="theme-icon" width="18" height="18">
-        </button>
       </nav>
     </div>
   </header>

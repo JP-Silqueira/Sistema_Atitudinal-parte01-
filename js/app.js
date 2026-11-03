@@ -479,11 +479,11 @@ const EduApp = (() => {
         return `${x.toFixed(1)},${y.toFixed(1)}`;
       }).join(' ');
 
-      svgHtml += `<polygon points="${points}" class="${level % 2 === 0 ? 'radar-grid-even' : 'radar-grid-odd'}" stroke-width="1" />`;
+      svgHtml += `<polygon points="${points}" fill="${level % 2 === 0 ? '#f8fafc' : '#ffffff'}" stroke="#cbd5e1" stroke-width="1" />`;
       
       // Rotulo numerico de escala no eixo superior
       const labelY = cy - r + 12;
-      svgHtml += `<text x="${cx + 4}" y="${labelY.toFixed(1)}" font-size="10" class="radar-scale-text" font-family="sans-serif">${level}</text>`;
+      svgHtml += `<text x="${cx + 4}" y="${labelY.toFixed(1)}" font-size="10" fill="#94a3b8" font-family="sans-serif">${level}</text>`;
     }
 
     // Eixos radiais e rotulos de dimensoes
@@ -493,7 +493,7 @@ const EduApp = (() => {
       const yEnd = cy + maxRadius * Math.sin(rad);
 
       // Linha do eixo
-      svgHtml += `<line x1="${cx}" y1="${cy}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" class="radar-axis-line" stroke-width="1" stroke-dasharray="2,2" />`;
+      svgHtml += `<line x1="${cx}" y1="${cy}" x2="${xEnd.toFixed(1)}" y2="${yEnd.toFixed(1)}" stroke="#cbd5e1" stroke-width="1" stroke-dasharray="2,2" />`;
 
       // Posicao do rotulo textual
       const labelR = maxRadius + 28;
@@ -504,7 +504,7 @@ const EduApp = (() => {
       if (Math.cos(rad) > 0.3) textAnchor = 'start';
       else if (Math.cos(rad) < -0.3) textAnchor = 'end';
 
-      svgHtml += `<text x="${xLabel.toFixed(1)}" y="${yLabel.toFixed(1)}" text-anchor="${textAnchor}" dominant-baseline="middle" font-size="11" font-weight="600" class="radar-dimension-text" font-family="sans-serif">${dim.label}</text>`;
+      svgHtml += `<text x="${xLabel.toFixed(1)}" y="${yLabel.toFixed(1)}" text-anchor="${textAnchor}" dominant-baseline="middle" font-size="11" font-weight="600" fill="#1e293b" font-family="sans-serif">${dim.label}</text>`;
     });
 
     // Renderiza cada dataset de valores
@@ -662,14 +662,14 @@ const EduApp = (() => {
       }
 
       dialogosLista.innerHTML = turmaDialogos.map(d => `
-        <div style="border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:0.85rem; background:var(--bg-surface);">
+        <div style="border:1px solid var(--border-light); border-radius:var(--radius-sm); padding:0.85rem; background:#ffffff;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.35rem;">
             <strong>${escapeHtml(d.studentName)} (${escapeHtml(d.authorType)}: ${escapeHtml(d.authorName)})</strong>
             <span class="tier-badge ${(d.status || '').toLowerCase() === 'aberto' ? 'tier-2' : 'tier-1'}">${escapeHtml(d.status)}</span>
           </div>
           <p style="font-size:0.85rem; color:var(--text-muted); margin-bottom:0.5rem;">${escapeHtml(d.message)}</p>
           ${d.response ? `
-            <div style="background:var(--color-success-bg); border-left:3px solid var(--color-success); padding:0.5rem 0.75rem; font-size:0.8rem;">
+            <div style="background:#f0fdf4; border-left:3px solid var(--color-success); padding:0.5rem 0.75rem; font-size:0.8rem;">
               <strong>Resposta (${escapeHtml(d.respondedBy)}):</strong> ${escapeHtml(d.response)}
             </div>
           ` : `
@@ -1142,14 +1142,14 @@ const EduApp = (() => {
             <div class="timeline-author">Educador: ${escapeHtml(o.teacherName || o.registeredBy || 'Docente')}</div>
 
             ${dialVinculado ? `
-              <div style="margin-top:0.6rem; padding:0.5rem 0.75rem; background:var(--color-primary-light); border:1px solid var(--border-color); border-radius:var(--radius-sm); font-size:0.8rem;">
+              <div style="margin-top:0.6rem; padding:0.5rem 0.75rem; background:#f0f9ff; border:1px solid #bae6fd; border-radius:var(--radius-sm); font-size:0.8rem;">
                 <div style="display:flex; justify-content:space-between;">
                   <strong>Dialogo Aberto por ${escapeHtml(dialVinculado.authorName)}:</strong>
                   <span class="tier-badge ${dialVinculado.status === 'Resolvido' || dialVinculado.status === 'Respondido' ? 'tier-1' : 'tier-2'}">${escapeHtml(dialVinculado.status)}</span>
                 </div>
                 <p style="margin-top:0.25rem; color:var(--text-muted);">${escapeHtml(dialVinculado.message)}</p>
                 ${dialVinculado.response ? `
-                  <div style="margin-top:0.35rem; padding:0.35rem; background:var(--bg-surface); border-left:2px solid var(--color-success); color:var(--text-main);">
+                  <div style="margin-top:0.35rem; padding:0.35rem; background:#ffffff; border-left:2px solid var(--color-success); color:var(--text-main);">
                     <strong>Resposta da Escola (${escapeHtml(dialVinculado.respondedBy)}):</strong> ${escapeHtml(dialVinculado.response)}
                   </div>
                 ` : '<div style="margin-top:0.25rem; color:var(--text-light); font-style:italic;">Aguardando devolutiva da equipe pedagogica.</div>'}
@@ -1307,75 +1307,6 @@ const EduApp = (() => {
     }
   }
 
-  // Gerenciamento de Tema (Modo Claro / Modo Escuro)
-  function initThemeManager() {
-    let savedTheme = null;
-    try {
-      savedTheme = localStorage.getItem('eduatitude_theme');
-    } catch (e) {}
-
-    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const currentTheme = savedTheme || (prefersDark ? 'dark' : 'light');
-
-    document.documentElement.setAttribute('data-theme', currentTheme);
-
-    function updateToggleButton(theme) {
-      const btn = document.getElementById('btn-theme-toggle');
-      if (btn) {
-        btn.setAttribute('aria-label', theme === 'dark' ? 'Alternar para Modo Claro' : 'Alternar para Modo Escuro');
-        btn.title = theme === 'dark' ? 'Ativar Modo Claro' : 'Ativar Modo Escuro';
-
-        let img = btn.querySelector('.theme-icon');
-        if (!img) {
-          img = document.createElement('img');
-          img.className = 'theme-icon';
-          img.width = 18;
-          img.height = 18;
-          btn.innerHTML = '';
-          btn.appendChild(img);
-        }
-        if (theme === 'dark') {
-          img.src = 'assets/icons/sun.svg';
-          img.alt = 'Modo Claro';
-        } else {
-          img.src = 'assets/icons/moon.svg';
-          img.alt = 'Modo Escuro';
-        }
-      }
-    }
-
-    updateToggleButton(currentTheme);
-
-    const toggleBtn = document.getElementById('btn-theme-toggle');
-    if (toggleBtn && !toggleBtn.dataset.themeBound) {
-      toggleBtn.dataset.themeBound = 'true';
-      toggleBtn.addEventListener('click', () => {
-        const activeTheme = document.documentElement.getAttribute('data-theme') || 'light';
-        const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
-        document.documentElement.setAttribute('data-theme', nextTheme);
-        try {
-          localStorage.setItem('eduatitude_theme', nextTheme);
-        } catch (e) {}
-        updateToggleButton(nextTheme);
-      });
-    }
-
-    if (window.matchMedia) {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-      mediaQuery.addEventListener('change', (e) => {
-        let hasSaved = null;
-        try {
-          hasSaved = localStorage.getItem('eduatitude_theme');
-        } catch (err) {}
-        if (!hasSaved) {
-          const sysTheme = e.matches ? 'dark' : 'light';
-          document.documentElement.setAttribute('data-theme', sysTheme);
-          updateToggleButton(sysTheme);
-        }
-      });
-    }
-  }
-
   return {
     initProfessorPage,
     initCoordenacaoPage,
@@ -1383,18 +1314,9 @@ const EduApp = (() => {
     abrirModalIntervencao,
     atualizarStatusIntervencao,
     abrirDialogoModal,
-    responderDialogo,
-    initThemeManager
+    responderDialogo
   };
 
 })();
 
 window.EduApp = EduApp;
-
-if (typeof document !== 'undefined') {
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', EduApp.initThemeManager);
-  } else {
-    EduApp.initThemeManager();
-  }
-}
